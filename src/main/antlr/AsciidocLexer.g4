@@ -9,21 +9,22 @@ lexer grammar AsciidocLexer;
 NEW_LINE: '\n';
 LINE_BREAK      : '+' ;
 
-ATTRIBUTE      : ':' '!'? (~[\n]+?) '!'? ':' (~[\n]*?) NEW_LINE;
+ATTRIBUTE_IDENTIFIER: ':' [a-zA-Z-]+ ':' -> pushMode(M_ATTRIBUTE);
 
 
 WS              : [ \t\r]+ -> skip ;
 COMMENT         : '//' .*? -> skip ;
-
+BOOKMARK: '.' [a-zA-Z] .*? NEW_LINE;
 BOLD: '**';
 UNDERLINE: '__';
-ASTERISK: '*' | '.';
+ASTERISK: '*'+ ' ' | '.'+ ' ';
 ID_TOKEN: '[[' -> pushMode(M_ID);
 
-HORIZONTAL_RULE: '----' '-'* NEW_LINE | '====' '='* NEW_LINE;
+HORIZONTAL_RULE: ('---' '-'+ NEW_LINE | '===' '='+ NEW_LINE )-> pushMode(M_BLOCK);
+
 DOT_RULE: '....' '.'* NEW_LINE;
 DOT : '.';
-HEADER: '='| '==' | '===' | '====' | '=====' | '======';
+HEADER: ('='| '==' | '===' | '====' | '=====' | '======') ' ';
 
 // [cols="1,1"]
 PARAMS: '[' -> pushMode(M_PARAMS);
@@ -31,19 +32,15 @@ PARAMS: '[' -> pushMode(M_PARAMS);
 TABLE_SEPARATOR: '|===';
 UP: '|' -> pushMode(M_TABLE);
 
-TEXT           : ~[\t\r\n*_=[.|] ~[\t\r\n]+ ;
+WORD           : (~[\t\r\n*_=[.| ] (~[ \t\r\n:]* | ~[ \t\r\n]* ':' ~'[') );
+MODIFIED_WORDS: '*' WORDS_MATERIAL+ '*' | '_' WORDS_MATERIAL+ '_';
+MACRO : [a-zA-Z]+ ':[' -> pushMode(M_PARAMS);
+fragment WORDS_MATERIAL : ~[\t\r\n];
 
-fragment HEXDIGIT: [a-fA-F0-9];
-fragment DIGIT: [0-9];
-
-
-mode M_HEADER;
-M_HEADER_WS              : [ \t\r]+ -> skip ;
-WORD: ~[\n]+ -> popMode;
 
 mode M_PARAMS;
 M_PARAMS_WS              : [ \t\r]+ -> skip ;
-IDENTIFIER      : [a-zA-Z#_]+;
+IDENTIFIER      : [a-zA-Z#] [a-zA-Z0-9_]*;
 EQ: '=';
 COMMA: ',';
 QUOTE: '"' | '\'';
@@ -58,3 +55,10 @@ M_TABLE_TEXT           : ~[\t\r\n|]+ -> popMode;
 mode M_ID;
 ID_TEXT           : ~[\t\r\n\]]+;
 END_ID : ']]' -> popMode;
+
+mode M_ATTRIBUTE;
+ATTRIBUTE_VALUE: ~[:] ~[\r\t\n]* -> popMode;
+
+mode M_BLOCK;
+BLOCK_CONTENT: ~[=-] ~[\r\t\n]* NEW_LINE;
+BLOCK_END: HORIZONTAL_RULE -> popMode;

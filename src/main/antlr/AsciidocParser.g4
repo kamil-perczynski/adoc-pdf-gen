@@ -8,30 +8,32 @@ options {
     tokenVocab = AsciidocLexer;
 }
 
-document: line+;
+document: section (NEW_LINE* section)* NEW_LINE* EOF;
 
-line: header | ATTRIBUTE | params | id | paragraph | table | list | horizontal_rule | DOT_RULE | NEW_LINE;
+list : list_item (NEW_LINE list_item)*;
+list_item : ASTERISK rich_text;
 
-table: TABLE_SEPARATOR NEW_LINE+ table_row+ TABLE_SEPARATOR;
+section: id? (attribute+ | BOOKMARK | params+)* (header | params | id | paragraph | list | table | block);
+
+block: HORIZONTAL_RULE BLOCK_CONTENT+ BLOCK_END;
+
+attribute: ATTRIBUTE_IDENTIFIER ATTRIBUTE_VALUE?;
+
+table: TABLE_SEPARATOR NEW_LINE+ (table_row NEW_LINE*)+ TABLE_SEPARATOR NEW_LINE;
 
 params: PARAMS param (COMMA param)* END_PARAMS NEW_LINE;
 param: IDENTIFIER (EQ ATTR)?;
 
-table_row : table_col+ NEW_LINE+;
+table_row : table_col+;
 table_col : UP M_TABLE_TEXT UP?;
 
-bold_text: BOLD TEXT BOLD;
-underline_text: UNDERLINE TEXT UNDERLINE;
-word: text | bold_text | underline_text;
+rich_text: word+;
+word: WORD | MODIFIED_WORDS | macro;
 
+macro: MACRO param (COMMA param)* END_PARAMS;
 
-paragraph : (word+ NEW_LINE)+;
-
-text: TEXT;
+paragraph : rich_text (NEW_LINE rich_text)*;
 
 id: ID_TOKEN ID_TEXT END_ID NEW_LINE;
 
-horizontal_rule: HORIZONTAL_RULE;
-header: HEADER TEXT NEW_LINE;
-
-list : ASTERISK+ text NEW_LINE;
+header: HEADER WORD+;
