@@ -7,6 +7,7 @@ import io.github.kamilperczynski.adocparser.AsciidocParserBaseListener
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.tree.TerminalNode
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import java.time.OffsetDateTime
 
@@ -17,7 +18,7 @@ class AdocParserTest {
 
     }
 
-    @Test
+    @RepeatedTest(20)
     fun test() {
         val adoc = loadResource("doc2.adoc")
 
@@ -45,6 +46,7 @@ class AdocParserTest {
 
         // show difference in millis
         println("Time: ${t1.toInstant().toEpochMilli() - t0.toInstant().toEpochMilli()} ms")
+        println("---")
     }
 
 }
@@ -97,7 +99,7 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
         if (ctx.list() != null) {
             val items = ctx.list().list_item().map { listItemcontext ->
                 val itemText = listItemcontext.rich_text()
-                    .word()
+                    .flatMap { it.word() }
                     .map { it.text }
                     .joinToString(separator = " ") { it }
 
@@ -105,6 +107,11 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
             }
 
             _sections.add(AdocListSection(sectionId, items))
+        }
+
+        if (ctx.block() != null) {
+            val blockText = ctx.block().BLOCK_CONTENT().joinToString(separator = "") { it.text }
+            _sections.add(AdocBlock(sectionId, blockText))
         }
 
         if (ctx.header() != null) {
@@ -123,6 +130,11 @@ interface AdocSection {
 }
 
 data class AdocParagraph(
+    override val id: String?,
+    val text: String
+) : AdocSection
+
+data class AdocBlock(
     override val id: String?,
     val text: String
 ) : AdocSection

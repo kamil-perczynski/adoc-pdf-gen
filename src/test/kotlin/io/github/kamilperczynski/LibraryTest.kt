@@ -28,9 +28,11 @@ fun printPdfStuff(sections: List<AdocSection>) {
 
     // Left
     FontFactory.registerDirectory("/Users/kperczynski/fonties/Ubuntu")
+    FontFactory.registerDirectory("/Users/kperczynski/fonties/JetBrains_Mono")
 
-    val baseFont = FontFactory.getFont("times-roman", BaseFont.WINANSI, false, 10f)
-    val baseHeaderFont = FontFactory.getFont("ubuntu-regular", BaseFont.WINANSI, true, 10f)
+    val baseFont = FontFactory.getFont("times-roman", BaseFont.WINANSI, false, 11f)
+    val baseHeaderFont = FontFactory.getFont("ubuntu-regular", BaseFont.WINANSI, true, 16f)
+    val monospaceFont = FontFactory.getFont("jetbrainsmono-regular", BaseFont.WINANSI, true, 8f)
 
 
     // A4 SIZE
@@ -59,6 +61,26 @@ fun printPdfStuff(sections: List<AdocSection>) {
                 paragraph.add(LineSeparator(0.5f, 100f, Color.lightGray, 0, -8f))
                 paragraph.spacingAfter = 16f
                 document.add(paragraph)
+            }
+
+            is AdocBlock -> {
+
+
+                // add a table
+                val table = PdfPTable(1)
+                table.widthPercentage = 100f
+                val paragraph = Paragraph(20f, section.text, monospaceFont)
+
+                val pdfPCell = PdfPCell(paragraph)
+                pdfPCell.setPadding(16f)
+                pdfPCell.backgroundColor = Color(0xF0, 0xF0, 0xF0)
+                pdfPCell.border = 0
+
+                table.addCell(pdfPCell)
+
+                document.add(table)
+                document.add(Paragraph("\n", baseFont))
+
             }
 
             is AdocParagraph -> {

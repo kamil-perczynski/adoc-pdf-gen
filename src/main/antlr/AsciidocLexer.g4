@@ -2,6 +2,12 @@ lexer grammar AsciidocLexer;
 
 @header {
     package io.github.kamilperczynski.adocparser;
+
+    import io.github.kamilperczynski.adocparser.BlockParsingCtx;
+}
+
+@members {
+  public static final BlockParsingCtx blockParsing = BlockParsingCtx.INSTANCE;
 }
 
 
@@ -20,14 +26,12 @@ UNDERLINE: '__';
 BULLET_ITEM: (ASTERISK+ ' ' | '.'+ ' ') {_tokenStartCharPositionInLine == 0}?;
 ID_TOKEN: '[[' -> pushMode(M_ID);
 
-HORIZONTAL_RULE: ('---' '-'+ NEW_LINE | '===' '='+ NEW_LINE )-> pushMode(M_BLOCK);
+HORIZONTAL_RULE: BLOCK_LINE {blockParsing.blockStart(HORIZONTAL_RULE, _input, getText())}? -> pushMode(M_BLOCK);
 
 DOT_RULE: '....' '.'* NEW_LINE;
-DOT : '.';
 ACUTE : '`';
 HEADER: ( '======' | '=====' | '====' | '===' | '==' | '=') {_tokenStartCharPositionInLine == 0}?;
 
-// [cols="1,1"]
 PARAMS: '[' -> pushMode(M_PARAMS);
 
 TABLE_SEPARATOR: '|===';
@@ -38,13 +42,13 @@ MACRO : [a-zA-Z]+ (('::' [a-zA-Z0-9/._]+) | ':') '[' -> pushMode(M_PARAMS);
 ASTERISK: '*';
 UNDERSCORE: '_';
 
-WORD: WORD_START | WORD_START WORD_END | WORD_START [a-zA-Z0-9!@#$%^&*()+{}./<>?="':_-]+ WORD_END
-;
-LINK :  [a-z] ':' WORD ('[' WORD ']')?;
+WORD: SIMPLE_WORDS WORD_END? | WORD_START | WORD_START WORD_END | WORD_START [a-zA-Z0-9!@#$%^&*()+{}./<>?="':_-]+ WORD_END;
+SIMPLE_WORDS : ([a-zA-Z]+ ([ \\t] [a-zA-Z]+)?)+;
+DOT : '.';
 
 fragment WORD_START : [a-zA-Z0-9!@#$%^&()+{},./<>?="';-];
 fragment WORD_END : [a-zA-Z0-9!@#$%^&()+{},./<>?="';:-];
-
+fragment BLOCK_LINE: '---' '-'+ NEW_LINE | '===' '='+ NEW_LINE;
 
 mode M_PARAMS;
 M_PARAMS_WS              : [ \t\r]+ -> skip ;
@@ -68,5 +72,5 @@ mode M_ATTRIBUTE;
 ATTRIBUTE_VALUE: ~[:] ~[\r\t\n]* -> popMode;
 
 mode M_BLOCK;
-BLOCK_CONTENT: ~[=-] ~[\r\t\n]* NEW_LINE;
-BLOCK_END: HORIZONTAL_RULE -> popMode;
+BLOCK_END: BLOCK_LINE {blockParsing.blockEnd(HORIZONTAL_RULE, _input, getText())}? -> popMode;
+BLOCK_CONTENT: ~[\r\t\n]* NEW_LINE;
