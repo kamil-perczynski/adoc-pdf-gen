@@ -2,7 +2,7 @@ package io.github.kamilperczynski
 
 import io.github.kamilperczynski.adocparser.AsciidocLexer
 import io.github.kamilperczynski.adocparser.AsciidocParser
-import io.github.kamilperczynski.adocparser.AsciidocParser.WordContext
+import io.github.kamilperczynski.adocparser.AsciidocParser.SentenceContext
 import io.github.kamilperczynski.adocparser.AsciidocParserBaseListener
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
@@ -74,18 +74,18 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
                     child.text
                     continue
                 }
-                val word = child as WordContext
+                val word = child as SentenceContext
 
-                if (word.macro() != null) {
-                    println("\n !!!! macro ${child.macro().MACRO().text} ${
-                        child.macro().param()
-                            .joinToString(separator = ", ") { "${it.IDENTIFIER().text}=${it.ATTR()?.text}" }
-                    }")
-                }
+//                if (word.macro() != null) {
+//                    println("\n !!!! macro ${child.macro().MACRO().text} ${
+//                        child.macro().param()
+//                            .joinToString(separator = ", ") { "${it.IDENTIFIER().text}=${it.ATTR()?.text}" }
+//                    }")
+//                }
 
-                if (word.WORD() != null) {
-                    currentParagraph.append(word.WORD().text).append(' ')
-                }
+
+                word.text.let(currentParagraph::append)
+
 
             }
             if (currentParagraph.isNotEmpty()) {
@@ -99,9 +99,9 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
         if (ctx.list() != null) {
             val items = ctx.list().list_item().map { listItemcontext ->
                 val itemText = listItemcontext.rich_text()
-                    .flatMap { it.word() }
+                    .flatMap { it.sentence() }
                     .map { it.text }
-                    .joinToString(separator = " ") { it }
+                    .joinToString(separator = "") { it }
 
                 AdocListItem(itemText)
             }
@@ -116,7 +116,7 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
 
         if (ctx.header() != null) {
             val level = ctx.header().HEADER().text.length
-            val title = ctx.header().rich_text().word().joinToString(separator = " ") { it.text }
+            val title = ctx.header().rich_text().sentence().joinToString(separator = "") { it.text }
 
             _sections.add(
                 AdocHeader(sectionId, level, title)

@@ -8,32 +8,39 @@ options {
     tokenVocab = AsciidocLexer;
 }
 
-document: section (NEW_LINE* section)* NEW_LINE* EOF;
+doc: (id | attribute | header | list | section_title | param_line | bookmark | block | paragraph | table | EOL+)+ EOF;
 
-list : list_item (NEW_LINE list_item)*;
-list_item : BULLET_ITEM rich_text+;
+block: BLOCK_START BLOCK_CONTENT+ BLOCK_END;
 
-section: id? (attribute+ | BOOKMARK | params+)* (header | params | id | paragraph | list | table | block);
+section:
+ | header
+ | id
+ | bookmark
+ | params
+ | paragraph
+;
 
-block: HORIZONTAL_RULE BLOCK_CONTENT+ BLOCK_END?;
+table: TABLE_MARK (table_cell+ T_EOL | T_EOL)+ TABLE_END;
+table_cell: TABLE_CELL_START (T_WORD | T_WS | T_INTER)+;
+macro: WORD COLON WORD? params;
 
-attribute: ATTRIBUTE_IDENTIFIER ATTRIBUTE_VALUE?;
+paragraph : (macro | params | link | WORD | WS | DOT | ESCAPED_CHAR | UNDERSCORE | ACUTE | COLON | INTER | ASTERISK)+ EOL;
 
-table: TABLE_SEPARATOR NEW_LINE+ (table_row NEW_LINE*)+ TABLE_SEPARATOR NEW_LINE;
+link: WORD COLON INTER WORD (INTER | (INTER WORD)+ INTER?)? section_title?;
 
-params: PARAMS param (COMMA param)* END_PARAMS NEW_LINE;
-param: IDENTIFIER (EQ ATTR)?;
+id : ID_START WORD+ ID_END EOL;
 
-table_row : table_col+;
-table_col : UP M_TABLE_TEXT UP?;
+section_title: PARAM_START IDENTIFIER PARAM_END;
 
-rich_text: ASTERISK word+ ASTERISK | UNDERSCORE word+ UNDERSCORE | ACUTE word+ ACUTE | word+;
-word: WORD (PARAMS param (COMMA param)* END_PARAMS)? | macro;
+params : PARAM_START param_item (COMMA param_item)* PARAM_END;
+param_item: IDENTIFIER (EQ ATTR)?;
 
-macro: MACRO param (COMMA param)* END_PARAMS;
+param_line: params EOL;
 
-paragraph : rich_text+ (NEW_LINE rich_text+)*;
+bookmark : DOT WORD ~(EOL | BLOCK_START)* EOL;
 
-id: ID_TOKEN ID_TEXT END_ID NEW_LINE;
+header : INTER WS WORD ~EOL* EOL;
+attribute: COLON WORD COLON WS ~EOL* EOL;
 
-header: HEADER rich_text NEW_LINE;
+list: list_item+;
+list_item: (ASTERISK | DOT)+ WS paragraph;
