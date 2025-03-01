@@ -8,16 +8,12 @@ options {
     tokenVocab = AsciidocLexer;
 }
 
-doc: (id | attribute | header | list | section_title | param_line | bookmark | block | paragraph | table | EOL+)+ EOF;
+doc: section (EOL* section)* EOL* EOF;
 
 block: BLOCK_START BLOCK_CONTENT+ BLOCK_END;
 
 section:
- | header
- | id
- | bookmark
- | params
- | paragraph
+ id | attribute | header | list | param_line | section_title | block | paragraph | table
 ;
 
 table: TABLE_MARK (table_cell+ T_EOL | T_EOL)+ TABLE_END;
@@ -26,18 +22,15 @@ macro: WORD COLON WORD? params;
 
 paragraph : (macro | params | link | WORD | WS | DOT | ESCAPED_CHAR | UNDERSCORE | ACUTE | COLON | INTER | ASTERISK)+ EOL;
 
-link: WORD COLON INTER WORD (INTER | (INTER WORD)+ INTER?)? section_title?;
+link: WORD COLON INTER WORD (INTER | (INTER WORD)+ INTER?)? params?;
 
 id : ID_START WORD+ ID_END EOL;
 
-section_title: PARAM_START IDENTIFIER PARAM_END;
-
-params : PARAM_START param_item (COMMA param_item)* PARAM_END;
-param_item: IDENTIFIER (EQ ATTR)?;
+params : PARAM_START PARAM_CONTENT? PARAM_END;
 
 param_line: params EOL;
 
-bookmark : DOT WORD ~(EOL | BLOCK_START)* EOL;
+section_title : DOT WORD ~(EOL | BLOCK_START)* EOL;
 
 header : INTER WS WORD ~EOL* EOL;
 attribute: COLON WORD COLON WS ~EOL* EOL;

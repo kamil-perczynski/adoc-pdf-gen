@@ -12,7 +12,7 @@ lexer grammar AsciidocLexer;
 
 ESCAPED_CHAR : '\\' .;
 
-BLOCK_START : ('===' '='+ EOL | '---' '-'+ EOL) -> pushMode(M_BLOCK);
+BLOCK_START : ('===' '='+ EOL | '---' '-'+ EOL | '___' '_'+ EOL) -> pushMode(M_BLOCK);
 
 TABLE_MARK : ('|===' EOL) -> pushMode(M_TABLE);
 
@@ -35,12 +35,7 @@ EOL : '\r'? '\n';
 INTER: ~[a-zA-Z0-9_\\ \r\n:[*]+;
 
 mode M_PARAM;
-M_PARAMS_WS              : [ \t\r]+ -> skip ;
-IDENTIFIER      : [a-zA-Z#] [a-zA-Z0-9_. -]*;
-EQ: '=';
-COMMA: ',';
-QUOTE: '"' | '\'';
-ATTR : QUOTE .*? QUOTE | [0-9a-zA-Z]+;
+PARAM_CONTENT : ~[\r\t\n\]]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;
@@ -51,9 +46,6 @@ T_WORD : [a-zA-Z0-9]+ (INTER [a-zA-Z0-9]+)*;
 T_WS : [ \t]+;
 T_EOL : '\r'? '\n';
 TABLE_END            : '|===' '\r'? '\n' -> popMode;
-
-mode M_ATTRIBUTE;
-ATTRIBUTE_VALUE: ~[:] ~[\r\t\n]* -> popMode;
 
 mode M_BLOCK;
 BLOCK_END: BLOCK_START {blockParsing.blockEnd(HORIZONTAL_RULE, _input, getText())}? -> popMode;
