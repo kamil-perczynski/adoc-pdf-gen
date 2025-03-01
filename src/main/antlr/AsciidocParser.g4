@@ -11,7 +11,7 @@ options {
 document: section (NEW_LINE* section)* NEW_LINE* EOF;
 
 list : list_item (NEW_LINE list_item)*;
-list_item : ASTERISK rich_text;
+list_item : BULLET_ITEM rich_text;
 
 section: id? (attribute+ | BOOKMARK | params+)* (header | params | id | paragraph | list | table | block);
 
@@ -27,8 +27,10 @@ param: IDENTIFIER (EQ ATTR)?;
 table_row : table_col+;
 table_col : UP M_TABLE_TEXT UP?;
 
-rich_text: word+;
-word: WORD | MODIFIED_WORDS | macro;
+rich_text: ASTERISK word+ ASTERISK | UNDERSCORE word+ UNDERSCORE | ACUTE word+ ACUTE | word+;
+word: WORD | macro | link | HEADER | DOT;
+
+link: WORD (PARAMS param END_PARAMS)? NEW_LINE?;
 
 macro: MACRO param (COMMA param)* END_PARAMS;
 
@@ -36,4 +38,4 @@ paragraph : rich_text (NEW_LINE rich_text)*;
 
 id: ID_TOKEN ID_TEXT END_ID NEW_LINE;
 
-header: HEADER WORD+;
+header: HEADER rich_text NEW_LINE;

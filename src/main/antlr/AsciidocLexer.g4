@@ -17,14 +17,15 @@ COMMENT         : '//' .*? -> skip ;
 BOOKMARK: '.' [a-zA-Z] .*? NEW_LINE;
 BOLD: '**';
 UNDERLINE: '__';
-ASTERISK: '*'+ ' ' | '.'+ ' ';
+BULLET_ITEM: (ASTERISK+ ' ' | '.'+ ' ') {_tokenStartCharPositionInLine == 0}?;
 ID_TOKEN: '[[' -> pushMode(M_ID);
 
 HORIZONTAL_RULE: ('---' '-'+ NEW_LINE | '===' '='+ NEW_LINE )-> pushMode(M_BLOCK);
 
 DOT_RULE: '....' '.'* NEW_LINE;
 DOT : '.';
-HEADER: ('='| '==' | '===' | '====' | '=====' | '======') ' ';
+ACUTE : '`';
+HEADER: ( '======' | '=====' | '====' | '===' | '==' | '=') {_tokenStartCharPositionInLine == 0}?;
 
 // [cols="1,1"]
 PARAMS: '[' -> pushMode(M_PARAMS);
@@ -32,15 +33,24 @@ PARAMS: '[' -> pushMode(M_PARAMS);
 TABLE_SEPARATOR: '|===';
 UP: '|' -> pushMode(M_TABLE);
 
-WORD           : (~[\t\r\n*_=[.| ] (~[ \t\r\n:]* | ~[ \t\r\n]* ':' ~'[') );
-MODIFIED_WORDS: '*' WORDS_MATERIAL+ '*' | '_' WORDS_MATERIAL+ '_';
-MACRO : [a-zA-Z]+ ':[' -> pushMode(M_PARAMS);
-fragment WORDS_MATERIAL : ~[\t\r\n];
+MACRO : [a-zA-Z]+ (('::' [a-zA-Z0-9/._]+) | ':') '[' -> pushMode(M_PARAMS);
+
+ASTERISK: '*';
+UNDERSCORE: '_';
+COLON: ':';
+
+WORD: [a-zA-Z0-9!@#$%^&()+{},./<>?="';-]
+ | [a-zA-Z0-9!@#$%^&()+{},./<>?="';-] [a-zA-Z0-9!@#$%^&*()+{},./<>?="':-]
+ | [a-zA-Z0-9!@#$%^&()+{},./<>?="';-] [a-zA-Z0-9!@#$%^&*()+{},./<>?="':_-]+ [a-zA-Z0-9!@#$%^&()+{},/<>?="':-]
+;
+LINK :  [a-z] ':' WORD ('[' WORD ']')?;
+
+fragment WORDS_MATERIAL : [a-zA-Z0-9!@#$%^&()+{},./<>?="';-];
 
 
 mode M_PARAMS;
 M_PARAMS_WS              : [ \t\r]+ -> skip ;
-IDENTIFIER      : [a-zA-Z#] [a-zA-Z0-9_]*;
+IDENTIFIER      : [a-zA-Z#] [a-zA-Z0-9_. -]*;
 EQ: '=';
 COMMA: ',';
 QUOTE: '"' | '\'';

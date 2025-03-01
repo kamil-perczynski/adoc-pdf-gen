@@ -20,6 +20,10 @@ tasks.compileKotlin {
     dependsOn(tasks.generateGrammarSource)
 }
 
+tasks.compileTestKotlin {
+    dependsOn(tasks.generateGrammarSource)
+}
+
 tasks.generateGrammarSource {
     inputs.dir(file("src/main/antlr"))
     outputDirectory = file("build/generated/antlr/main/io/github/kamilperczynski/adocparser")

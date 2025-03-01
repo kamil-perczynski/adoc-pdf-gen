@@ -2,32 +2,49 @@ package io.github.kamilperczynski
 
 import io.github.kamilperczynski.adocparser.AsciidocLexer
 import io.github.kamilperczynski.adocparser.AsciidocParser
-import io.github.kamilperczynski.adocparser.AsciidocParserListener
+import io.github.kamilperczynski.adocparser.AsciidocParser.WordContext
+import io.github.kamilperczynski.adocparser.AsciidocParserBaseListener
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CommonTokenStream
-import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.tree.ErrorNode
 import org.antlr.v4.runtime.tree.TerminalNode
 import org.junit.jupiter.api.Test
+import java.time.OffsetDateTime
 
 class AdocParserTest {
 
     @Test
+    fun boo() {
+
+    }
+
+    @Test
     fun test() {
-        val adoc = loadResource("doc.adoc")
+        val adoc = loadResource("doc2.adoc")
 
         // execute antlr4 parser AsciidocParser, generate code
 
+        val t00 = OffsetDateTime.now();
         val asciidocLexer = AsciidocLexer(
             ANTLRInputStream(adoc)
         )
         val parser = AsciidocParser(CommonTokenStream(asciidocLexer))
-        parser.addParseListener(AsciidocInterpreter())
+
+        val interpreter = AsciidocInterpreter()
+
+        parser.addParseListener(interpreter)
+        parser.document()
+        val t11 = OffsetDateTime.now()
+
+        // show difference in millis
+        println("Time: ${t11.toInstant().toEpochMilli() - t00.toInstant().toEpochMilli()} ms")
 
 
-        val docCtx = parser.document()
+        val t0 = OffsetDateTime.now()
+        printPdfStuff(interpreter.sections)
+        val t1 = OffsetDateTime.now()
 
-        println(docCtx.toStringTree())
+        // show difference in millis
+        println("Time: ${t1.toInstant().toEpochMilli() - t0.toInstant().toEpochMilli()} ms")
     }
 
 }
@@ -37,144 +54,91 @@ fun loadResource(resource: String): String {
 }
 
 
-internal class AsciidocInterpreter() : AsciidocParserListener {
+internal class AsciidocInterpreter : AsciidocParserBaseListener() {
 
+    val sections get(): List<AdocSection> = _sections
 
-    override fun visitTerminal(p0: TerminalNode?) {
-    }
+    private val _sections = mutableListOf<AdocSection>()
 
-    override fun visitErrorNode(p0: ErrorNode?) {
-    }
+    private val currentParagraph = StringBuilder()
 
-    override fun enterEveryRule(p0: ParserRuleContext?) {
-    }
-
-    override fun exitEveryRule(p0: ParserRuleContext?) {
-    }
-
-    override fun enterDocument(ctx: AsciidocParser.DocumentContext?) {
-    }
-
-    override fun exitDocument(ctx: AsciidocParser.DocumentContext?) {
-    }
-
-    override fun enterLine(ctx: AsciidocParser.LineContext?) {
-    }
-
-    override fun exitLine(ctx: AsciidocParser.LineContext?) {
-    }
-
-    override fun enterTable(ctx: AsciidocParser.TableContext?) {
-
-    }
-
-    override fun exitTable(ctx: AsciidocParser.TableContext?) {
-
-    }
-
-    override fun enterParams(ctx: AsciidocParser.ParamsContext?) {
-
-    }
-
-    override fun exitParams(ctx: AsciidocParser.ParamsContext?) {
+    override fun exitSection(ctx: AsciidocParser.SectionContext?) {
         ctx!!
-        for (param in ctx.children) {
-            println(param)
+        val sectionId = ctx.id().firstOrNull()?.ID_TEXT()?.text
+
+        if (ctx.paragraph() != null) {
+            for (child in ctx.paragraph().rich_text().flatMap { it.children }) {
+                if (child is TerminalNode) {
+                    child.text
+                    continue
+                }
+                val word = child as WordContext
+
+                if (word.macro() != null) {
+                    println("\n !!!! macro ${child.macro().MACRO().text} ${
+                        child.macro().param()
+                            .joinToString(separator = ", ") { "${it.IDENTIFIER().text}=${it.ATTR()?.text}" }
+                    }")
+                }
+                if (word.WORD() != null) {
+                    currentParagraph.append(word.WORD().text).append(' ')
+                }
+                if (word.DOT() != null) {
+                    currentParagraph.append(word.DOT().text)
+                }
+
+            }
+            if (currentParagraph.isNotEmpty()) {
+                _sections.add(
+                    AdocParagraph(sectionId, currentParagraph.toString())
+                )
+            }
+            currentParagraph.clear()
+        }
+
+        if (ctx.list() != null) {
+            val items = ctx.list().list_item().map { listItemcontext ->
+                val itemText = listItemcontext.rich_text()
+                    .word()
+                    .map { it.text }
+                    .joinToString(separator = " ") { it }
+
+                AdocListItem(itemText)
+            }
+
+            _sections.add(AdocListSection(sectionId, items))
+        }
+
+        if (ctx.header() != null) {
+            val level = ctx.header().HEADER().text.length
+            val title = ctx.header().rich_text().word().joinToString(separator = " ") { it.text }
+
+            _sections.add(
+                AdocHeader(sectionId, level, title)
+            )
         }
     }
-
-    override fun enterParam(ctx: AsciidocParser.ParamContext?) {
-
-    }
-
-    override fun exitParam(ctx: AsciidocParser.ParamContext?) {
-
-    }
-
-    override fun enterTable_row(ctx: AsciidocParser.Table_rowContext?) {
-
-    }
-
-    override fun exitTable_row(ctx: AsciidocParser.Table_rowContext?) {
-
-    }
-
-    override fun enterTable_col(ctx: AsciidocParser.Table_colContext?) {
-
-    }
-
-    override fun exitTable_col(ctx: AsciidocParser.Table_colContext?) {
-
-    }
-
-    override fun enterBold_text(ctx: AsciidocParser.Bold_textContext?) {
-
-    }
-
-    override fun exitBold_text(ctx: AsciidocParser.Bold_textContext?) {
-
-    }
-
-    override fun enterUnderline_text(ctx: AsciidocParser.Underline_textContext?) {
-
-    }
-
-    override fun exitUnderline_text(ctx: AsciidocParser.Underline_textContext?) {
-
-    }
-
-    override fun enterWord(ctx: AsciidocParser.WordContext?) {
-
-    }
-
-    override fun exitWord(ctx: AsciidocParser.WordContext?) {
-
-    }
-
-    override fun enterParagraph(ctx: AsciidocParser.ParagraphContext?) {
-
-    }
-
-    override fun exitParagraph(ctx: AsciidocParser.ParagraphContext?) {
-
-    }
-
-    override fun enterText(ctx: AsciidocParser.TextContext?) {
-    }
-
-    override fun exitText(ctx: AsciidocParser.TextContext?) {
-
-    }
-
-    override fun enterId(ctx: AsciidocParser.IdContext?) {
-
-    }
-
-    override fun exitId(ctx: AsciidocParser.IdContext?) {
-
-    }
-
-    override fun enterHorizontal_rule(ctx: AsciidocParser.Horizontal_ruleContext?) {
-
-    }
-
-    override fun exitHorizontal_rule(ctx: AsciidocParser.Horizontal_ruleContext?) {
-
-    }
-
-    override fun enterHeader(ctx: AsciidocParser.HeaderContext?) {
-    }
-
-    override fun exitHeader(ctx: AsciidocParser.HeaderContext?) {
-    }
-
-    override fun enterList(ctx: AsciidocParser.ListContext?) {
-
-    }
-
-    override fun exitList(ctx: AsciidocParser.ListContext?) {
-
-    }
-
-
 }
+
+interface AdocSection {
+    val id: String?
+}
+
+data class AdocParagraph(
+    override val id: String?,
+    val text: String
+) : AdocSection
+
+
+data class AdocListSection(
+    override val id: String?,
+    val items: List<AdocListItem>
+) : AdocSection
+
+data class AdocListItem(val text: String)
+
+data class AdocHeader(
+    override val id: String?,
+    val level: Int,
+    val text: String
+) : AdocSection

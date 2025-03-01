@@ -33,7 +33,7 @@ Tables are easy to deal with as long as you keep them simple! To add a table, pl
 .Countries in Europe
 [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
 |===
-|Country | Population | Size
+| {set:cellbgcolor:#4169E1} Country | Population | Size
 | Monaco
 | 36371
 | 1.98
@@ -45,7 +45,6 @@ Tables are easy to deal with as long as you keep them simple! To add a table, pl
 The first line is used for referencing. You can reference <<table_countries>> in your text. The only thing you should change in that line is the table id, which is "table_countries" in this case. Please do not remove the "#", please do not change anything else in that line.
 
 You can define the style and width of each column. In our example, the first column takes 50% of the entire width, the second and third column take 25% each. The total width of the table is 75% of the text width.
-
 The letters after the width percentage indicate if the column is e=emphasis, m=monospaced, a=asciidoc, s=strong. The d=default does not need to be set.
 
 Cell alignment: If you need to align a column, you may indicate this by setting ^,<, or >. Examples:
@@ -143,6 +142,15 @@ For citations that also have an associated URL, the URL should be inserted inlin
 
 Please use the following syntax to insert citations anywhere in the text:
 
+The hail-and-rainbow protocol can be initiated at five levels:
+
+. doublefootnote:[The double hail-and-rainbow level makes my toes tingle.]
+. tertiary
+. supernumerary
+. supermassive
+. apocalyptic
+
+
 ----
 cite:[VanZyl2009]
 ----
@@ -158,7 +166,7 @@ which will create links in the compiled HTML/PDF that look as follows: cite:[Van
 
 Then you need to provide all citation information in the file resources/bibtex-file.bib. This file uses the bibtex file format, which is defined in full detail http://www.bibtex.org/Format/[here]. The bibtex-style file shall remain untouched.
 
-The conversion of _cite:[]_ takes place at the time of asciidoc-to-pdf/html conversion and requires two things:
+The conversion of _cite:[FooBar]_ takes place at the time of asciidoc-to-pdf/html conversion and requires two things:
 
 . The definition of the _bibtex-file_ and the _bibtex-style_ attributes. This is done in this template in file <<bibtexAttributes,er.adoc>>. Please make sure that both files are available at their defined locations.
 
