@@ -10,10 +10,10 @@ options {
 
 doc: section (EOL* section)* EOL* EOF;
 
-block: BLOCK_START BLOCK_CONTENT+ BLOCK_END;
+block: param_line? section_title? BLOCK_START BLOCK_CONTENT+ BLOCK_END;
 
 section:
- id | attribute | header | list | param_line | section_title | block | paragraph | table
+ id_line | attribute | header | list | block | paragraph | table | param_line
 ;
 
 table: TABLE_MARK (table_cell+ T_EOL | T_EOL)+ TABLE_END;
@@ -24,15 +24,16 @@ paragraph : (macro | params | link | WORD | WS | DOT | ESCAPED_CHAR | UNDERSCORE
 
 link: WORD COLON INTER WORD (INTER | (INTER WORD)+ INTER?)? params?;
 
-id : ID_START WORD+ ID_END EOL;
+id_line : id EOL;
+id: ID_START WORD+ ID_END;
 
 params : PARAM_START PARAM_CONTENT? PARAM_END;
 
 param_line: params EOL;
 
-section_title : DOT WORD ~(EOL | BLOCK_START)* EOL;
+section_title : DOT WORD (WS WORD)* EOL;
 
-header : INTER WS WORD ~EOL* EOL;
+header : INTER WS (id | ~EOL)+ EOL;
 attribute: COLON WORD COLON WS ~EOL* EOL;
 
 list: list_item+;
