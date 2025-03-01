@@ -1,24 +1,14 @@
 package io.github.kamilperczynski
 
 import com.lowagie.text.*
+import com.lowagie.text.pdf.BaseFont
 import com.lowagie.text.pdf.PdfPCell
 import com.lowagie.text.pdf.PdfPTable
 import com.lowagie.text.pdf.PdfWriter
 import com.lowagie.text.pdf.draw.LineSeparator
-import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.nio.file.Files
 import java.nio.file.Paths
-
-
-class LibraryTest {
-
-    @Test
-    fun test() {
-        printPdfStuff(emptyList())
-    }
-
-}
 
 
 fun printPdfStuff(sections: List<AdocSection>) {
@@ -31,15 +21,16 @@ fun printPdfStuff(sections: List<AdocSection>) {
 
 
     val document = Document()
-    PdfWriter.getInstance(document, Files.newOutputStream(file))
+    val writer = PdfWriter.getInstance(document, Files.newOutputStream(file))
+    writer.setPdfVersion(PdfWriter.VERSION_1_7);
     document.setMargins(64f, 64f, 64f, 64f)
     document.open()
 
     // Left
-
     FontFactory.registerDirectory("/Users/kperczynski/fonties/Ubuntu")
 
-    val font = FontFactory.getFont("ubuntu-regular", 10f)
+    val baseFont = FontFactory.getFont("times-roman", BaseFont.WINANSI, false, 10f)
+    val baseHeaderFont = FontFactory.getFont("ubuntu-regular", BaseFont.WINANSI, true, 10f)
 
 
     // A4 SIZE
@@ -60,33 +51,33 @@ fun printPdfStuff(sections: List<AdocSection>) {
                     else -> 10f
                 }
 
-                val headerFont = FontFactory.getFont("ubuntu-regular", fontSize)
+                val headerFont = Font(baseHeaderFont)
+                headerFont.size = fontSize
                 headerFont.style = Font.BOLD
 
                 val paragraph = Paragraph(section.text, headerFont)
                 paragraph.add(LineSeparator(0.5f, 100f, Color.lightGray, 0, -8f))
-                paragraph.add(Paragraph("\n", font))
-
+                paragraph.spacingAfter = 16f
                 document.add(paragraph)
             }
 
             is AdocParagraph -> {
-                document.add(Paragraph(section.text, font))
-                document.add(Paragraph("\n", font))
+                document.add(Paragraph(section.text, baseFont))
+                document.add(Paragraph("\n", baseFont))
             }
 
             is AdocListSection -> {
                 val pdfList = com.lowagie.text.List(16f)
-                pdfList.setListSymbol(Chunk("\u2022", Font(font.family, 18f)).setTextRise(-3f))
+                pdfList.setListSymbol(Chunk("\u2022", Font(baseFont.family, 18f)).setTextRise(-3f))
 
                 for (item in section.items) {
-                    val listItem = ListItem(item.text, font)
+                    val listItem = ListItem(item.text, baseFont)
                     listItem.spacingAfter = 4f
                     pdfList.add(listItem)
                 }
 
                 document.add(pdfList)
-                document.add(Paragraph("\n", font))
+                document.add(Paragraph("\n", baseFont))
             }
         }
     }
@@ -96,10 +87,10 @@ fun printPdfStuff(sections: List<AdocSection>) {
     pdfPTable.widthPercentage = 100f
 
     //Create cells
-    val pdfPCell1 = PdfPCell(Paragraph("Cell 1", font))
-    val pdfPCell2 = PdfPCell(Paragraph("Cell 2", font))
-    val pdfPCell3 = PdfPCell(Paragraph("Cell 3", font))
-    val pdfPCell4 = PdfPCell(Paragraph("Cell 4", font))
+    val pdfPCell1 = PdfPCell(Paragraph("Cell 1", baseFont))
+    val pdfPCell2 = PdfPCell(Paragraph("Cell 2", baseFont))
+    val pdfPCell3 = PdfPCell(Paragraph("Cell 3", baseFont))
+    val pdfPCell4 = PdfPCell(Paragraph("Cell 4", baseFont))
 
     pdfPCell4.paddingBottom = 6f
 

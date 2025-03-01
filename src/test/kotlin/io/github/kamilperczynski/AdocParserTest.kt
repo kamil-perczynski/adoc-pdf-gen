@@ -80,11 +80,9 @@ internal class AsciidocInterpreter : AsciidocParserBaseListener() {
                             .joinToString(separator = ", ") { "${it.IDENTIFIER().text}=${it.ATTR()?.text}" }
                     }")
                 }
+
                 if (word.WORD() != null) {
                     currentParagraph.append(word.WORD().text).append(' ')
-                }
-                if (word.DOT() != null) {
-                    currentParagraph.append(word.DOT().text)
                 }
 
             }

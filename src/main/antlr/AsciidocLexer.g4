@@ -37,15 +37,13 @@ MACRO : [a-zA-Z]+ (('::' [a-zA-Z0-9/._]+) | ':') '[' -> pushMode(M_PARAMS);
 
 ASTERISK: '*';
 UNDERSCORE: '_';
-COLON: ':';
 
-WORD: [a-zA-Z0-9!@#$%^&()+{},./<>?="';-]
- | [a-zA-Z0-9!@#$%^&()+{},./<>?="';-] [a-zA-Z0-9!@#$%^&*()+{},./<>?="':-]
- | [a-zA-Z0-9!@#$%^&()+{},./<>?="';-] [a-zA-Z0-9!@#$%^&*()+{},./<>?="':_-]+ [a-zA-Z0-9!@#$%^&()+{},/<>?="':-]
+WORD: WORD_START | WORD_START WORD_END | WORD_START [a-zA-Z0-9!@#$%^&*()+{}./<>?="':_-]+ WORD_END
 ;
 LINK :  [a-z] ':' WORD ('[' WORD ']')?;
 
-fragment WORDS_MATERIAL : [a-zA-Z0-9!@#$%^&()+{},./<>?="';-];
+fragment WORD_START : [a-zA-Z0-9!@#$%^&()+{},./<>?="';-];
+fragment WORD_END : [a-zA-Z0-9!@#$%^&()+{},./<>?="';:-];
 
 
 mode M_PARAMS;

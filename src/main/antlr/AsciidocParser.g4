@@ -28,9 +28,7 @@ table_row : table_col+;
 table_col : UP M_TABLE_TEXT UP?;
 
 rich_text: ASTERISK word+ ASTERISK | UNDERSCORE word+ UNDERSCORE | ACUTE word+ ACUTE | word+;
-word: WORD | macro | link | HEADER | DOT;
-
-link: WORD (PARAMS param END_PARAMS)? NEW_LINE?;
+word: WORD (PARAMS param (COMMA param)* END_PARAMS)? | macro;
 
 macro: MACRO param (COMMA param)* END_PARAMS;
 
