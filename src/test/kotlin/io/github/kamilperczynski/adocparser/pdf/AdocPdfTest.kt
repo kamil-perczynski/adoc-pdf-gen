@@ -9,6 +9,7 @@ import java.nio.file.Paths
 import kotlin.system.measureTimeMillis
 
 class AdocPdfTest {
+
     @RepeatedTest(20)
     fun testPrintPdf() {
         val file = Paths.get("./LibraryTest-test.pdf")
@@ -17,9 +18,9 @@ class AdocPdfTest {
             Files.delete(file)
         }
 
-        val adoc = AdocPdfTest::class.java.classLoader.getResourceAsStream("./doc2.adoc")?.let {
-            String(it.readAllBytes())
-        } ?: throw IllegalStateException("Cannot read file")
+        val adoc = AdocPdfTest::class.java.classLoader
+            .getResourceAsStream("./doc2.adoc")?.let { String(it.readAllBytes()) }
+            ?: throw IllegalStateException("Cannot read file")
 
         val ast: AdocAST
 
@@ -35,4 +36,5 @@ class AdocPdfTest {
 
         print("Parsing time: $parsingTime ms\nPrinting time: $printingMillis ms\n")
     }
+
 }

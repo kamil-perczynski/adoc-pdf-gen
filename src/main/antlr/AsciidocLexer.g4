@@ -10,21 +10,25 @@ lexer grammar AsciidocLexer;
   public static final BlockParsingCtx blockParsing = BlockParsingCtx.INSTANCE;
 }
 
+BLOCK_START : ('===' '='+ WS? EOL | '---' '-'+ WS? EOL | '___' '_'+ WS? EOL) -> pushMode(M_BLOCK);
 ESCAPED_CHAR : '\\' .;
 DOUBLE_SLASH : '//';
 HEADER_START : '='+ ' ';
 
-BLOCK_START : ('===' '='+ EOL | '---' '-'+ EOL | '___' '_'+ EOL) -> pushMode(M_BLOCK);
 
 TABLE_MARK : ('|===' EOL) -> pushMode(M_TABLE);
 
 WORD : [a-zA-Z0-9]+ ((INTER | UNDERSCORE) [a-zA-Z0-9]+)*;
+
+ADMONITION_LINE: ('[NOTE]' | '[TIP]' | '[IMPORTANT]' | '[CAUTION]' | '[WARNING]') EOL;
+ADMONITION_INLINE: ('NOTE: ' | 'TIP: ' | 'IMPORTANT: ' | 'CAUTION: ' | 'WARNING: ');
 
 DOT: '.'+;
 COLON: ':'+;
 ASTERISK: '*'+;
 UNDERSCORE: '_'+;
 ACUTE: '`'+;
+LIST_START: [0-9]+ DOT;
 
 ID_START : '[[';
 ID_END : ']]';

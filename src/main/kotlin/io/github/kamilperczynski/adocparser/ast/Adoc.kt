@@ -7,10 +7,9 @@ fun parseAsciiDocAST(parser: AsciidocParser): AdocAST {
     val ast = AdocAST()
 
     for (child in parser.doc().section()) {
-        if (child.section_title() != null) {
-
+        if (child.section_title().isNotEmpty()) {
             val chunks = AdocTextChunker()
-                .parseLine { child.section_title().children.drop(1) }
+                .parseLine { child.section_title().last().children.drop(1) }
                 .chunks
 
             ast.push(AdocSectionTitle(chunks))
@@ -36,7 +35,7 @@ fun parseAsciiDocAST(parser: AsciidocParser): AdocAST {
                 val level = listItem.children.first().text.length
 
                 val paragraph = AdocTextChunker()
-                    .parseLine { listItem.paragraph_line().children }
+                    .parseLine { listItem.paragraph_line().flatMap { it.children } }
                     .finishParagraph()
 
                 listItems.add(AdocListItem(level, paragraph))

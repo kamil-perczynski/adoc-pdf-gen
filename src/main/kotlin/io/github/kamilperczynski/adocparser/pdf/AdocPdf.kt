@@ -24,7 +24,7 @@ class AdocPdf {
         FontFactory.registerDirectory("/Users/kperczynski/fonties/JetBrains_Mono")
 
         this.document = Document()
-        this.baseFont = Font(Font.TIMES_ROMAN, 12f, Font.NORMAL)
+        this.baseFont = Font(Font.TIMES_ROMAN, 11f, Font.NORMAL)
         this.baseHeaderFont = FontFactory.getFont("ubuntu-regular", BaseFont.WINANSI, true, 16f)
         baseHeaderFont.style = Font.BOLD
         this.monospaceFont = FontFactory.getFont("jetbrainsmono-regular", BaseFont.WINANSI, true, 8f)
