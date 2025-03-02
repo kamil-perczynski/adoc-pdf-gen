@@ -339,7 +339,7 @@ Please use the following syntax to insert citations anywhere in the text:
 
 The hail-and-rainbow protocol can be initiated at five levels:
 
-. doublefootnote:[The double hail-and-rainbow level makes my toes tingle.]
+. double footnote:[The double hail-and-rainbow level makes my toes tingle.]
 . tertiary
 . supernumerary
 . supermassive

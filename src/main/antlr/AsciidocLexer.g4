@@ -11,6 +11,8 @@ lexer grammar AsciidocLexer;
 }
 
 ESCAPED_CHAR : '\\' .;
+DOUBLE_SLASH : '//';
+HEADER_START : '='+ ' ';
 
 BLOCK_START : ('===' '='+ EOL | '---' '-'+ EOL | '___' '_'+ EOL) -> pushMode(M_BLOCK);
 
@@ -48,5 +50,6 @@ T_EOL : '\r'? '\n';
 TABLE_END            : '|===' '\r'? '\n' -> popMode;
 
 mode M_BLOCK;
-BLOCK_END: BLOCK_START {blockParsing.blockEnd(HORIZONTAL_RULE, _input, getText())}? -> popMode;
+// {blockParsing.blockEnd(BLOCK_START, _input, getText())}?
+BLOCK_END: BLOCK_START  -> popMode;
 BLOCK_CONTENT: ~[\r\t\n]* EOL;
