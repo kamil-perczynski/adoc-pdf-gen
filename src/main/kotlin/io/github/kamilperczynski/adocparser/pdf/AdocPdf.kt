@@ -46,16 +46,54 @@ class AdocPdf {
                 is AdocBlock -> printBlock(node)
                 is AdocList -> printList(node)
                 is AdocSectionTitle -> printSectionTitle(node)
+                is AdocTable -> printTable(node)
             }
         }
 
         document.close()
     }
 
+    private fun printTable(node: AdocTable) {
+        val table = PdfPTable(node.colsCount)
+        table.widthPercentage = 100f
+        table.setSpacingBefore(baseFont.size * .667f)
+        table.setSpacingAfter(baseFont.size * .667f)
+
+        for ((idx, col) in node.cols.withIndex()) {
+            val pdfPCell = PdfPCell()
+            pdfPCell.setPadding(baseFont.size)
+            pdfPCell.paddingTop = 0f
+
+            if (idx < node.colsCount) {
+                pdfPCell.backgroundColor = Color(0xF0, 0xF0, 0xF0)
+            }
+
+            for (chunk in col.chunks) {
+                val paragraph = Paragraph()
+
+                if (idx < node.colsCount) {
+                    paragraph.font = Font(baseFont)
+                    paragraph.font.style = Font.BOLD
+                } else {
+                    paragraph.font = Font(baseFont)
+                    paragraph.font.style = Font.ITALIC
+                }
+
+                printPhraseChunks(col.chunks, paragraph)
+                pdfPCell.addElement(paragraph)
+            }
+
+            table.addCell(pdfPCell)
+        }
+
+        document.add(table)
+    }
+
     private fun printSectionTitle(node: AdocSectionTitle) {
         val pdfParagraph = Paragraph()
         pdfParagraph.font = Font(baseFont)
         pdfParagraph.font.style = Font.BOLDITALIC
+        pdfParagraph.spacingAfter = baseFont.size * 0.25f
 
         printPhraseChunks(node.chunks, pdfParagraph)
 
@@ -67,11 +105,17 @@ class AdocPdf {
         @Suppress("RemoveRedundantQualifierName")
         val pdfList = com.lowagie.text.List(16f)
         pdfList.setListSymbol(Chunk("\u2022", baseFont))
+        pdfList.indentationLeft = baseFont.size * .5f
 
-        for (item in node.items) {
+        for ((idx, item) in node.items.withIndex()) {
             val listItem = ListItem()
             listItem.font = baseFont
-            listItem.spacingAfter = 4f
+
+            if (idx == 0) {
+                listItem.spacingBefore = baseFont.size * .25f
+            }
+
+            listItem.spacingAfter = baseFont.size * .25f
 
             printPhraseChunks(item.paragraph.chunks, listItem)
             pdfList.add(listItem)
@@ -132,8 +176,9 @@ class AdocPdf {
 
         val pdfParagraph = Paragraph()
         pdfParagraph.font = baseFont
-        pdfParagraph.multipliedLeading = 1.5f
-        pdfParagraph.spacingAfter = baseFont.size * 1.5f
+        pdfParagraph.multipliedLeading = 1.25f
+        pdfParagraph.spacingBefore = baseFont.size * .5f
+        pdfParagraph.spacingAfter = baseFont.size * .75f
 
         printPhraseChunks(adocParagraph.chunks, pdfParagraph)
 

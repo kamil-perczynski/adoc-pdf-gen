@@ -1,8 +1,7 @@
 package io.github.kamilperczynski.adocparser.pdf
 
+import io.github.kamilperczynski.adocparser.AdocParser
 import io.github.kamilperczynski.adocparser.ast.AdocAST
-import io.github.kamilperczynski.adocparser.ast.parseAsciiDocAST
-import io.github.kamilperczynski.adocparser.runAsciiDocAntlr
 import org.junit.jupiter.api.RepeatedTest
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -25,10 +24,8 @@ class AdocPdfTest {
         val ast: AdocAST
 
         val parsingTime = measureTimeMillis {
-            val parser = runAsciiDocAntlr(adoc)
-            ast = parseAsciiDocAST(parser)
+            ast = AdocParser(adoc).parseAdocAst()
         }
-
 
         val printingMillis = measureTimeMillis {
             AdocPdf().print(ast, Files.newOutputStream(file))

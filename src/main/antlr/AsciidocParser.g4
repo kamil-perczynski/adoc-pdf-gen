@@ -22,7 +22,7 @@ table: TABLE_MARK (table_cell+ T_EOL | T_EOL)+ TABLE_END;
 table_cell: TABLE_CELL_START (T_WORD | T_WS | T_INTER)+;
 macro: WORD COLON WORD? params;
 
-list_item: ASTERISK WS paragraph_line+ | DOT WS paragraph_line+ | LIST_START WS paragraph_line+;
+list_item: ASTERISK WS paragraph_line | DOT WS paragraph_line | LIST_START WS paragraph_line;
 
 admonition: ADMONITION_INLINE paragraph_line+;
 

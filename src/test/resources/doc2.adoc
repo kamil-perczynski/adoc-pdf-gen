@@ -7,13 +7,6 @@
 This section explains some concepts frequently required by Asciidoc novices. Please use this file as a template for your own clauses.
 ===============================================
 
-[IMPORTANT]
-====
-For citations that also have an associated URL, the URL should be inserted inline as in https://www.ogc.org/[this example]. An endnote citation should still also be included (just in case the link stops working in the future).
-
-See <<UseOfCitations, Use of Citations>> for full citation instructions.
-====
-
 === Headlines
 All headlines are marked by "=" signs. The top level in each each file starts with level 2 ("=="). Important: For whatever strange reason, headings in annexes are marked differently.
 
@@ -30,16 +23,55 @@ It is important that you use the same syntax for all images, otherwise the autom
 Tables are easy to deal with as long as you keep them simple! To add a table, please use the following syntax.
 
 [#table_countries,reftext='{table-caption} {counter:table-num}']
+.GDP of selected countries in trillions
+|===
+| Country | 2018 | 2019 | 2020 | 2021 | 2022
+
+| Germany
+| 3.95 USD
+| 3.86 USD
+| 3.80 USD
+| 4.22 USD
+| 4.26 USD
+
+| France
+| 2.78 USD
+| 2.72 USD
+| 2.60 USD
+| 2.94 USD
+| 2.96 USD
+
+| United Kingdom
+| 2.86 USD
+| 2.83 USD
+| 2.71 USD
+| 3.13 USD
+| 3.19 USD
+
+| Italy
+| 2.07 USD
+| 2.00 USD
+| 1.89 USD
+| 2.10 USD
+| 2.12 USD
+
+| Spain
+| 1.43 USD
+| 1.39 USD
+| 1.28 USD
+| 1.43 USD
+| 1.45 USD
+|===
+
+
+[#table_countries,reftext='{table-caption} {counter:table-num}']
 .Countries in Europe
 [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
 |===
-| {set:cellbgcolor:#4169E1} Country | Population | Size
+| Country | Population | Size
 | Monaco
 | 36371
-| 1.98
-| Gibraltar
-| 29431
-| 6.8
+| 1.98 | Gibraltar | 29431 | 6.8
 |===
 
 The first line is used for referencing. You can reference <<table_countries>> in your text. The only thing you should change in that line is the table id, which is "table_countries" in this case. Please do not remove the "#", please do not change anything else in that line.
@@ -228,7 +260,7 @@ Tables are easy to deal with as long as you keep them simple! To add a table, pl
 .Countries in Europe
 [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
 |===
-| {set:cellbgcolor:#4169E1} Country | Population | Size
+| Country | Population | Size
 | Monaco
 | 36371
 | 1.98
@@ -420,16 +452,45 @@ It is important that you use the same syntax for all images, otherwise the autom
 Tables are easy to deal with as long as you keep them simple! To add a table, please use the following syntax.
 
 [#table_countries,reftext='{table-caption} {counter:table-num}']
-.Countries in Europe
-[cols="50e,^25m,>25s",width="75%",options="header",align="center"]
+.GDP of selected countries in trillions
+[cols="1,1,1,1,1,1", options="header"]
 |===
-| {set:cellbgcolor:#4169E1} Country | Population | Size
-| Monaco
-| 36371
-| 1.98
-| Gibraltar
-| 29431
-| 6.8
+| Country | 2018 | 2019 | 2020 | 2021 | 2022
+
+| Germany
+| 3.95 USD
+| 3.86 USD
+| 3.80 USD
+| 4.22 USD
+| 4.26 USD
+
+| France
+| 2.78 USD
+| 2.72 USD
+| 2.60 USD
+| 2.94 USD
+| 2.96 USD
+
+| United Kingdom
+| 2.86 USD
+| 2.83 USD
+| 2.71 USD
+| 3.13 USD
+| 3.19 USD
+
+| Italy
+| 2.07 USD
+| 2.00 USD
+| 1.89 USD
+| 2.10 USD
+| 2.12 USD
+
+| Spain
+| 1.43 USD
+| 1.39 USD
+| 1.28 USD
+| 1.43 USD
+| 1.45 USD
 |===
 
 The first line is used for referencing. You can reference <<table_countries>> in your text. The only thing you should change in that line is the table id, which is "table_countries" in this case. Please do not remove the "#", please do not change anything else in that line.

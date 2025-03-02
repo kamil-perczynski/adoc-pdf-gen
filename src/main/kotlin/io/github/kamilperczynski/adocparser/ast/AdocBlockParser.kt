@@ -2,7 +2,7 @@ package io.github.kamilperczynski.adocparser.ast
 
 import io.github.kamilperczynski.adocparser.AsciidocParser
 
-class BlockParser(private val ast: AdocAST) {
+class AdocBlockParser(private val ast: AdocAST) {
 
     fun parse(block: AsciidocParser.BlockContext) {
         val chunks = block.BLOCK_CONTENT()
