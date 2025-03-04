@@ -1,10 +1,7 @@
 package io.github.kamilperczynski.adocparser.pdf
 
 import com.lowagie.text.*
-import com.lowagie.text.pdf.BaseFont
-import com.lowagie.text.pdf.PdfPCell
-import com.lowagie.text.pdf.PdfPTable
-import com.lowagie.text.pdf.PdfWriter
+import com.lowagie.text.pdf.*
 import com.lowagie.text.pdf.draw.LineSeparator
 import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.ast.ChunkType.*
@@ -38,6 +35,7 @@ class AdocPdf {
         document.setMargins(64f, 64f, 64f, 64f)
         document.open()
 
+        titlePage(writer)
 
         for (node in ast.nodes) {
             when (node) {
@@ -51,6 +49,35 @@ class AdocPdf {
         }
 
         document.close()
+    }
+
+    private fun titlePage(writer: PdfWriter) {
+        // add rectancle covering whole page with pastel green background
+        val rectangle = Rectangle(PageSize.A4.width, PageSize.A4.height)
+        rectangle.backgroundColor = Color(0x21, 0x33, 0x2d)
+
+        document.add(rectangle)
+
+        val c = writer.directContent
+
+        val titlePageFont = Font(baseFont)
+        titlePageFont.size = 64f
+        titlePageFont.style = Font.BOLD
+        titlePageFont.color = Color(0xFF, 0xFF, 0xFF)
+
+        val columnText = ColumnText(c)
+        columnText.setText(Phrase("Java Adoc Parser Demo", titlePageFont))
+        columnText.setSimpleColumn(
+            64f,
+            00f,
+            PageSize.A4.width - 64f,
+            PageSize.A4.height * 0.67f,
+            titlePageFont.size,
+            Element.ALIGN_CENTER
+        )
+        columnText.go()
+
+        document.newPage()
     }
 
     private fun printTable(node: AdocTable) {
