@@ -33,8 +33,20 @@ class PdfTablePrinter(
                 pdfPCell.backgroundColor = Color(0xF0, 0xF0, 0xF0)
             }
 
+            when (col.alignment) {
+                "<" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_LEFT
+                "^" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_CENTER
+                ">" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_RIGHT
+            }
+
             for (chunk in col.chunks) {
                 val paragraph = Paragraph()
+
+                when (col.alignment) {
+                    "<" -> paragraph.alignment = PdfPCell.ALIGN_LEFT
+                    "^" -> paragraph.alignment = PdfPCell.ALIGN_CENTER
+                    ">" -> paragraph.alignment = PdfPCell.ALIGN_RIGHT
+                }
 
                 if (idx < node.colsCount) {
                     paragraph.font = Font(baseFont)
@@ -43,11 +55,6 @@ class PdfTablePrinter(
                     paragraph.font = Font(baseFont)
                     paragraph.font.style = Font.ITALIC
                 }
-
-                if (idx % node.colsCount != 0) {
-                    paragraph.alignment = Paragraph.ALIGN_RIGHT
-                }
-
 
                 paragraphPrinter.printPhraseChunks(col.chunks, paragraph)
                 pdfPCell.addElement(paragraph)

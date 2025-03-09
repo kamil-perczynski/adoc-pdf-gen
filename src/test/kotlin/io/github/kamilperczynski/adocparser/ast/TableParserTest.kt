@@ -37,8 +37,8 @@ class TableParserTest {
             AdocTable(
                 colsCount = 3,
                 cols = listOf(
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Country "))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Population "))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Population"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "Size"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "Monaco"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "36371"))),
@@ -63,8 +63,8 @@ class TableParserTest {
                 | Country | Population | Size
                 
                 
-                | Monaco | 36371 | 1.98
-                | Gibraltar | 29431 | 6.8
+                2.3+>| Monaco | 36371 | 1.98
+                3+| Gibraltar | 29431 | 6.8
                 |===
                 
             """.trimIndent()
@@ -79,14 +79,14 @@ class TableParserTest {
             AdocTable(
                 colsCount = 3,
                 cols = listOf(
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Country "))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Population "))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Population"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "Size"))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Monaco "))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "36371 "))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Monaco")), "2.3+", ">"),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "36371"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "1.98"))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "Gibraltar "))),
-                    AdocTableCol(listOf(AdocChunk(TEXT, "29431 "))),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "Gibraltar")), "3+"),
+                    AdocTableCol(listOf(AdocChunk(TEXT, "29431"))),
                     AdocTableCol(listOf(AdocChunk(TEXT, "6.8")))
                 )
             )

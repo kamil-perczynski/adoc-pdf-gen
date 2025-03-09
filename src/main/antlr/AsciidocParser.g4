@@ -19,7 +19,7 @@ section:
 ;
 
 table: TABLE_MARK (table_cell+ T_EOL | T_EOL)+ TABLE_END;
-table_cell: TABLE_CELL_START (T_WORD | T_WS | T_INTER)+;
+table_cell: T_COLSPAN? T_ALIGNMENT? TABLE_CELL_START (T_WORD | T_WS | T_INTER)+ (T_EOL (T_WORD | T_WS | T_INTER)+)*;
 macro: WORD COLON WORD? params;
 
 list_item: ASTERISK WS paragraph_line | DOT WS paragraph_line | LIST_START WS paragraph_line;
@@ -36,10 +36,10 @@ params : PARAM_START PARAM_CONTENT? PARAM_END;
 param_line: params EOL;
 
 section_title : DOT WORD (WS WORD)* EOL;
-attribute: COLON WORD COLON WS ~EOL* EOL;
+attribute: COLON WORD COLON (WS ~EOL*)? EOL;
 
 paragraph_line :
-  (macro | params | link | WORD | WS | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | INTER | ASTERISK)
-  (macro | params | link | WORD | WS | DOT | HEADER_START | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | COLON | INTER | ASTERISK)*
+  (macro | link | WORD | WS | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | INTER | ASTERISK)
+  (macro | link | WORD | WS | DOT | HEADER_START | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | COLON | INTER | ASTERISK)*
   EOL
 ;

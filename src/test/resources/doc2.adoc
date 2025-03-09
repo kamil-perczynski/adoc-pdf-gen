@@ -27,42 +27,42 @@ Tables are easy to deal with as long as you keep them simple! To add a table, pl
 [#table_countries,reftext='{table-caption} {counter:table-num}']
 .GDP of selected countries in trillions
 |===
-| Country | 2018 | 2019 | 2020 | 2021 | 2022
+| Country >| 2018 >| 2019 >| 2020 >| 2021 >| 2022
 
 | Germany
-| 3.95 USD
-| 3.86 USD
-| 3.80 USD
-| 4.22 USD
-| 4.26 USD
+>| 3.95 USD
+>| 3.86 USD
+>| 3.80 USD
+>| 4.22 USD
+>| 4.26 USD
 
 | France
-| 2.78 USD
-| 2.72 USD
-| 2.60 USD
-| 2.94 USD
-| 2.96 USD
+>| 2.78 USD
+>| 2.72 USD
+>| 2.60 USD
+>| 2.94 USD
+>| 2.96 USD
 
 | United Kingdom
-| 2.86 USD
-| 2.83 USD
-| 2.71 USD
-| 3.13 USD
-| 3.19 USD
+>| 2.86 USD
+>| 2.83 USD
+>| 2.71 USD
+>| 3.13 USD
+>| 3.19 USD
 
 | Italy
-| 2.07 USD
-| 2.00 USD
-| 1.89 USD
-| 2.10 USD
-| 2.12 USD
+>| 2.07 USD
+>| 2.00 USD
+>| 1.89 USD
+>| 2.10 USD
+>| 2.12 USD
 
 | Spain
-| 1.43 USD
-| 1.39 USD
-| 1.28 USD
-| 1.43 USD
-| 1.45 USD
+>| 1.43 USD
+>| 1.39 USD
+>| 1.28 USD
+>| 1.43 USD
+>| 1.45 USD
 |===
 
 
@@ -70,10 +70,10 @@ Tables are easy to deal with as long as you keep them simple! To add a table, pl
 .Countries in Europe
 [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
 |===
-| Country | Population | Size
+| Country >| Population >| Size
 | Monaco
-| 36371
-| 1.98 | Gibraltar | 29431 | 6.8
+>| 36371
+>| 1.98 | Gibraltar >| 29431 >| 6.8
 |===
 
 The first line is used for referencing. You can reference <<table_countries>> in your text. The only thing you should change in that line is the table id, which is "table_countries" in this case. Please do not remove the "#", please do not change anything else in that line.
