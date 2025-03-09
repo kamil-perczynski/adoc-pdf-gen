@@ -45,7 +45,7 @@ PARAM_CONTENT : ~[\r\t\n\]]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;
-TABLE_CELL_START         : '|' WS;
+TABLE_CELL_START         :  ([0-9]* '.'? [0-9]+ '+')? ('^' | '>' | '<')? '|' WS;
 T_INTER: ~[a-zA-Z0-9 \r\n\][*]+;
 T_WORD : [a-zA-Z0-9]+ (INTER [a-zA-Z0-9]+)*;
 
