@@ -45,6 +45,10 @@ class PdfHeaderPrinter(
     }
 
     private fun titlePage(node: AdocHeader, writer: PdfWriter) {
+        if (writer.pageNumber != 1) {
+            document.newPage()
+        }
+
         // add rectancle covering whole page with pastel green background
         val rectangle = Rectangle(PageSize.A4.width, PageSize.A4.height)
         rectangle.backgroundColor = Color(0x21, 0x33, 0x2d)
@@ -80,14 +84,7 @@ class PdfHeaderPrinter(
 
 }
 
-interface ChapterCounter {
-    val chapterCounter: Int
-
-    fun nextChapterNumber(): Int
-}
-
-
-class ChapterSection(paragraph: Paragraph, number: Int) : Chapter(paragraph, number) {
+private class ChapterSection(paragraph: Paragraph, number: Int) : Chapter(paragraph, number) {
 
     override fun getTitle(): Paragraph {
         return Paragraph(this.title)

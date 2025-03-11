@@ -45,15 +45,17 @@ PARAM_CONTENT : ~[\r\t\n\]]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;
+T_FORMAT_MODE: [adehlms];
 T_ALIGNMENT : [^><];
 T_COLSPAN : [0-9]* '.'? [0-9]+ '+';
 TABLE_CELL_START: '|';
-T_WORD : [a-zA-Z0-9]+ (INTER [a-zA-Z0-9]+)*;
+
 
 T_WS : [ \t]+;
 T_EOL : '\r'? '\n';
 TABLE_END : '|===' '\r'? '\n' -> popMode;
-T_INTER: ~[a-zA-Z0-9 \r\n\][*|^><] | ~[a-zA-Z0-9 \r\n\][*|^><] ~[a-zA-Z0-9 \r\n\][*]+;
+T_INTER: ~[a-zA-Z0-9 \r\n^><|]+;
+T_WORD : [a-zA-Z0-9]+;
 
 mode M_BLOCK;
 // {blockParsing.blockEnd(BLOCK_START, _input, getText())}?

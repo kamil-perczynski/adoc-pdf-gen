@@ -13,7 +13,7 @@ class PdfListPrinter(
 ) {
 
     fun printList(node: AdocList) {
-        // who in the world names classes like this?
+        // `List`? who in the world names classes like this?
         val pdfList = com.lowagie.text.List(16f)
         pdfList.setListSymbol(Chunk("\u2022", baseFont))
         pdfList.indentationLeft = baseFont.size * .5f

@@ -32,7 +32,13 @@ data class AdocChunk(val type: ChunkType, val text: String)
 data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 
 data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode
-data class AdocTableCol(val chunks: List<AdocChunk>, val colspan: String? = null, val alignment: String? = "<") : AdocNode
+
+data class AdocTableCol(
+    val chunks: List<AdocChunk>,
+    val colspan: String? = null,
+    val alignment: String? = "<",
+    val cellFormat: String = "d"
+) : AdocNode
 
 enum class ChunkType {
     TEXT, EMPHASIS, PARAMS, LINK
