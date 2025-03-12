@@ -14,6 +14,11 @@ class PdfParagraphPrinter(private val document: Document, private val baseFont: 
             return
         }
 
+        val pdfParagraph = toPdfParagraph(adocParagraph)
+        document.add(pdfParagraph)
+    }
+
+    fun toPdfParagraph(adocParagraph: AdocParagraph): Paragraph {
         val pdfParagraph = Paragraph()
         pdfParagraph.font = baseFont
         pdfParagraph.multipliedLeading = 1.25f
@@ -22,7 +27,7 @@ class PdfParagraphPrinter(private val document: Document, private val baseFont: 
 
         printPhraseChunks(adocParagraph.chunks, pdfParagraph)
 
-        document.add(pdfParagraph)
+        return pdfParagraph
     }
 
     fun printPhraseChunks(

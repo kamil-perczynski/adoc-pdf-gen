@@ -40,6 +40,7 @@ class AdocPdf {
 
     private val blockPrinter = PdfBlockPrinter(document, monospaceFont)
     private val listPrinter = PdfListPrinter(document, baseFont, pdfParagraphPrinter)
+    private val admonitionPrinter = AdmonitionPrinter(document, baseFont, pdfParagraphPrinter)
 
 
     fun print(ast: AdocAST, out: OutputStream) {
@@ -57,6 +58,7 @@ class AdocPdf {
                 is AdocBlock -> blockPrinter.printBlock(node)
                 is AdocList -> listPrinter.printList(node)
                 is AdocTable -> tablePrinter.printTable(node)
+                is AdocAdmonition -> admonitionPrinter.printAdmonition(node)
             }
         }
 
