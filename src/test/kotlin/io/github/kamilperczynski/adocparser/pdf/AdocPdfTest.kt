@@ -45,7 +45,7 @@ class AdocPdfTest {
             AdocPdf(stylesheet).print(ast, Files.newOutputStream(file))
         }
 
-        print("Total: ${parsingTime + printingMillis}ms \t Parsing time: $parsingTime ms \t printing time: $printingMillis ms\n")
+        print("Total: ${parsingTime + printingMillis}ms \t| Parsing time: $parsingTime ms \t | Printing time: $printingMillis ms\n")
     }
 
 }
