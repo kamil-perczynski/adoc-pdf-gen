@@ -2,6 +2,9 @@ package io.github.kamilperczynski.adocparser.pdf
 
 import io.github.kamilperczynski.adocparser.AdocParser
 import io.github.kamilperczynski.adocparser.ast.AdocAST
+import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlAdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.yaml.parseYamlStylesheet
 import org.junit.jupiter.api.RepeatedTest
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -12,6 +15,15 @@ class AdocPdfTest {
     @RepeatedTest(20)
     fun testPrintPdf() {
         val file = Paths.get("./LibraryTest-test.pdf")
+
+        val yamlStylesheet = parseYamlStylesheet(
+            this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!
+        )
+
+        val stylesheet: AdocStylesheet = YamlAdocStylesheet(
+            Paths.get("/Users/kperczynski/fonties"),
+            yamlStylesheet
+        )
 
         if (Files.exists(file)) {
             Files.delete(file)
@@ -27,8 +39,10 @@ class AdocPdfTest {
             ast = AdocParser(adoc).parseAdocAst()
         }
 
+        stylesheet.registerFonts()
+
         val printingMillis = measureTimeMillis {
-            AdocPdf().print(ast, Files.newOutputStream(file))
+            AdocPdf(stylesheet).print(ast, Files.newOutputStream(file))
         }
 
         print("Parsing time: $parsingTime ms\nPrinting time: $printingMillis ms\n")
