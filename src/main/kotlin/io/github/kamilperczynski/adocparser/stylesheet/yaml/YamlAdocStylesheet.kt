@@ -29,7 +29,7 @@ class YamlAdocStylesheet(
 
     override fun registerFonts() {
         for (entry in yamlStylesheet.font.catalog) {
-            val fontFamily = entry.key.lowercase()
+            val fontFamily = entry.key
             val fonts = entry.value
 
             registerFont(fonts, fontFamily)
@@ -77,19 +77,19 @@ class YamlAdocStylesheet(
         fonts.bold?.let {
             FontFactory.register(
                 fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "$fontFamily-bold",
+                "${fontFamily.lowercase()}-bold",
             )
         }
         fonts.italic?.let {
             FontFactory.register(
                 fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "$fontFamily-italic",
+                "${fontFamily.lowercase()}-italic",
             )
         }
         fonts.boldItalic?.let {
             FontFactory.register(
                 fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "$fontFamily-bolditalic",
+                "${fontFamily.lowercase()}-bolditalic",
             )
         }
         fonts.normal?.let {
