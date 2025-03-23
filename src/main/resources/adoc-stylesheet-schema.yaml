@@ -1,0 +1,69 @@
+$id: "https://example.com/adoc-stylesheet-schema.json"
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "AdocStylesheetSchema"
+type: "object"
+$defs:
+  FontCatalogItem:
+    type: "object"
+    properties:
+      normal:
+        type: "string"
+      bold:
+        type: "string"
+      italic:
+        type: "string"
+      boldItalic:
+        type: "string"
+  FontCatalog:
+    type: "object"
+    additionalProperties:
+      $ref: "#/$defs/FontCatalogItem"
+  FontProperties:
+    type: object
+    properties:
+      fontFamily:
+        type: string
+      fontSize:
+        type: [ string, number ]
+      fontColor:
+        type: string
+      fontStyle:
+        type: string
+        enum: [ "normal", "bold", "italic", "boldItalic" ]
+      textDecoration:
+        type: string
+        enum: [ "none", "underline", "line-through", "overline" ]
+      align:
+        type: string
+        enum: [ "left", "center", "right", "justify" ]
+properties:
+  font:
+    type: "object"
+    properties:
+      catalog:
+        description: "Map of font families with mappings to the TTF files, respectively for each variant"
+        $ref: "#/$defs/FontCatalog"
+  base:
+    $ref: "#/$defs/FontProperties"
+  sectionTitle:
+    $ref: "#/$defs/FontProperties"
+  heading:
+    description: >-
+      Font properties for headings. 
+      The properties defined here are the default values for all headings.
+    type: object
+    properties:
+      font:
+        $ref: "#/$defs/FontProperties"
+      h1:
+        $ref: "#/$defs/FontProperties"
+      h2:
+        $ref: "#/$defs/FontProperties"
+      h3:
+        $ref: "#/$defs/FontProperties"
+      h4:
+        $ref: "#/$defs/FontProperties"
+      h5:
+        $ref: "#/$defs/FontProperties"
+      h6:
+        $ref: "#/$defs/FontProperties"

@@ -17,6 +17,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     antlr("org.antlr:antlr4:4.9.3")
 
+    implementation("org.yaml:snakeyaml:2.4")
+
     testImplementation("org.assertj:assertj-core:3.27.3")
 }
 

@@ -5,9 +5,13 @@ import io.github.kamilperczynski.adocparser.ast.AdocChunk
 import io.github.kamilperczynski.adocparser.ast.AdocParagraph
 import io.github.kamilperczynski.adocparser.ast.AdocSectionTitle
 import io.github.kamilperczynski.adocparser.ast.ChunkType.*
+import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
 import java.awt.Color
 
-class PdfParagraphPrinter(private val document: Document, private val baseFont: Font) {
+class PdfParagraphPrinter(
+    private val document: Document,
+    private val stylesheet: AdocStylesheet
+) {
 
     fun printParagraph(adocParagraph: AdocParagraph) {
         if (adocParagraph.chunks.isEmpty() || adocParagraph.chunks.first().text.isBlank()) {
@@ -20,10 +24,7 @@ class PdfParagraphPrinter(private val document: Document, private val baseFont: 
 
     fun toPdfParagraph(adocParagraph: AdocParagraph): Paragraph {
         val pdfParagraph = Paragraph()
-        pdfParagraph.font = baseFont
-        pdfParagraph.multipliedLeading = 1.25f
-        pdfParagraph.spacingBefore = baseFont.size * .5f
-        pdfParagraph.spacingAfter = baseFont.size * .75f
+        stylesheet.styleParagraph(pdfParagraph, adocParagraph)
 
         printPhraseChunks(adocParagraph.chunks, pdfParagraph)
 
@@ -41,12 +42,12 @@ class PdfParagraphPrinter(private val document: Document, private val baseFont: 
                 }
 
                 EMPHASIS -> {
-                    val emphasisFont = Font(baseFont).apply { style = Font.BOLD }
+                    val emphasisFont = Font(paragraph.font).apply { style = Font.BOLD }
                     paragraph.add(Chunk(chunk.text, emphasisFont))
                 }
 
                 LINK -> {
-                    val linkFont = Font(baseFont).apply {
+                    val linkFont = Font(paragraph.font).apply {
                         style = Font.UNDERLINE
                         color = Color.BLUE
                     }
@@ -66,9 +67,7 @@ class PdfParagraphPrinter(private val document: Document, private val baseFont: 
 
     fun printSectionTitle(node: AdocSectionTitle) {
         val pdfParagraph = Paragraph()
-        pdfParagraph.font = Font(baseFont)
-        pdfParagraph.font.style = Font.BOLDITALIC
-        pdfParagraph.spacingAfter = baseFont.size * 0.25f
+        stylesheet.styleSectionTitle(pdfParagraph, node)
 
         printPhraseChunks(node.chunks, pdfParagraph)
 

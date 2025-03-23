@@ -5,12 +5,12 @@ import com.lowagie.text.pdf.ColumnText
 import com.lowagie.text.pdf.PdfWriter
 import com.lowagie.text.pdf.draw.LineSeparator
 import io.github.kamilperczynski.adocparser.ast.AdocHeader
+import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
 import java.awt.Color // awt? my eyes are bleeding
 
 class PdfHeaderPrinter(
     private val document: Document,
-    private var baseFont: Font,
-    private val baseHeaderFont: Font,
+    private val stylesheet: AdocStylesheet,
     private var chapterCounter: ChapterCounter,
     private val pdfParagraphPrinter: PdfParagraphPrinter
 ) {
@@ -21,23 +21,21 @@ class PdfHeaderPrinter(
             return
         }
 
-        val fontSize = when (node.level) {
-            2 -> 20f
-            3 -> 16f
-            4 -> 12f
-            else -> 10f
-        }
-
         val pdfParagraph = Paragraph()
-        pdfParagraph.font = Font(baseHeaderFont).also { it.size = fontSize }
-        pdfParagraph.multipliedLeading = 1.5f
-        pdfParagraph.spacingAfter = baseFont.size * 1.5f
-        pdfParagraph.spacingBefore = baseFont.size
+        stylesheet.styleHeader(pdfParagraph, node)
         pdfParagraph.keepTogether = true
 
         pdfParagraphPrinter.printPhraseChunks(node.chunks, pdfParagraph)
 
-        pdfParagraph.add(LineSeparator(.5f, 100f, Color.lightGray, Element.ALIGN_CENTER, -baseFont.size * .75f))
+        pdfParagraph.add(
+            LineSeparator(
+                .5f,
+                100f,
+                Color.lightGray,
+                Element.ALIGN_CENTER,
+                -stylesheet.baseFont.size * .75f
+            )
+        )
 
         val chapter = ChapterSection(pdfParagraph, chapterCounter.nextChapterNumber())
         chapter.isTriggerNewPage = false
@@ -57,7 +55,7 @@ class PdfHeaderPrinter(
 
         val c = writer.directContent
 
-        val titlePageFont = Font(baseFont)
+        val titlePageFont = Font(stylesheet.baseFont)
         titlePageFont.size = 54f
         titlePageFont.style = Font.BOLD
         titlePageFont.color = Color(0xFF, 0xFF, 0xFF)

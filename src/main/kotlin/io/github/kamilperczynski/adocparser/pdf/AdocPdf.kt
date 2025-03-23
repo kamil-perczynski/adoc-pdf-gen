@@ -1,47 +1,32 @@
 package io.github.kamilperczynski.adocparser.pdf
 
 import com.lowagie.text.Document
-import com.lowagie.text.Font
 import com.lowagie.text.FontFactory
 import com.lowagie.text.pdf.BaseFont
 import com.lowagie.text.pdf.PdfWriter
 import io.github.kamilperczynski.adocparser.ast.*
+import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
 import java.io.OutputStream
 
-class AdocPdf {
-
-    companion object {
-        init {
-            FontFactory.registerDirectory("/Users/kperczynski/fonties/Ubuntu")
-            FontFactory.registerDirectory("/Users/kperczynski/fonties/JetBrains_Mono")
-        }
-    }
+class AdocPdf(stylesheet: AdocStylesheet) {
 
     private val document = Document()
     private val chapterCounter: ChapterCounter = DocumentChapterCounter()
 
-    private val baseFont =
-        Font(Font.TIMES_ROMAN, 11f, Font.NORMAL)
-
     private val monospaceFont =
         FontFactory.getFont("jetbrainsmono-regular", BaseFont.WINANSI, true, 8f)
 
-    private val baseHeaderFont =
-        FontFactory.getFont("ubuntu-regular", BaseFont.WINANSI, true, 16f).also { it.style = Font.BOLD }
-
-    private val pdfParagraphPrinter =
-        PdfParagraphPrinter(document, baseFont)
+    private val pdfParagraphPrinter = PdfParagraphPrinter(document, stylesheet)
 
     private val headerPrinter =
-        PdfHeaderPrinter(document, baseFont, baseHeaderFont, chapterCounter, pdfParagraphPrinter)
+        PdfHeaderPrinter(document, stylesheet, chapterCounter, pdfParagraphPrinter)
 
     private val tablePrinter =
-        PdfTablePrinter(document, baseFont, pdfParagraphPrinter)
+        PdfTablePrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
 
     private val blockPrinter = PdfBlockPrinter(document, monospaceFont)
-    private val listPrinter = PdfListPrinter(document, baseFont, pdfParagraphPrinter)
-    private val admonitionPrinter = AdmonitionPrinter(document, baseFont, pdfParagraphPrinter)
-
+    private val listPrinter = PdfListPrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
+    private val admonitionPrinter = AdmonitionPrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
 
     fun print(ast: AdocAST, out: OutputStream) {
         val writer = PdfWriter.getInstance(document, out)

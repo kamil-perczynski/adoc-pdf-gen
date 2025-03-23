@@ -1,0 +1,28 @@
+$schema: "./adoc-stylesheet-schema.yaml"
+font:
+  catalog:
+    JetbrainsMono:
+      normal: static/JetBrainsMono-Regular.ttf
+      bold: static/JetBrainsMono-Bold.ttf
+      italic: static/JetBrainsMono-Italic.ttf
+      boldItalic: static/JetBrainsMono-BoldItalic.ttf
+    Ubuntu:
+      normal: Ubuntu-Regular.ttf
+      bold: Ubuntu-Medium.ttf
+      italic: Ubuntu-Italic.ttf
+      boldItalic: Ubuntu-BoldItalic.ttf
+base:
+  fontSize: 11
+sectionTitle:
+  fontStyle: boldItalic
+heading:
+  font:
+    fontFamily: ubuntu
+    fontStyle: bold
+    textDecoration: none
+  h1:
+    fontSize: 24
+  h2:
+    fontSize: 20
+  h3:
+    fontSize: 16
