@@ -8,7 +8,6 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.util.function.Supplier
 
-
 class AdocTextChunker {
 
     private var currentChunk: ChunkBuilder = ChunkBuilder()
@@ -20,12 +19,12 @@ class AdocTextChunker {
             when (child) {
                 is MacroContext -> {
                     finishChunk()
-                    println("..MACRO..: ${child.text}")
+                    // println("..MACRO..: ${child.text}")
                 }
 
                 is ParamsContext -> {
                     finishChunk()
-                    println("..PARAMS..: ${child.text}")
+                    // println("..PARAMS..: ${child.text}")
                 }
 
                 is LinkContext -> {

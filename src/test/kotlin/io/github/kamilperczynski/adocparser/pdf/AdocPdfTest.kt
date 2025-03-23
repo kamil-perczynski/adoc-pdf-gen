@@ -21,7 +21,7 @@ class AdocPdfTest {
         )
 
         val stylesheet: AdocStylesheet = YamlAdocStylesheet(
-            Paths.get("/Users/kperczynski/fonties"),
+            Paths.get("./fonts").toAbsolutePath(),
             yamlStylesheet
         )
 
@@ -45,7 +45,7 @@ class AdocPdfTest {
             AdocPdf(stylesheet).print(ast, Files.newOutputStream(file))
         }
 
-        print("Parsing time: $parsingTime ms\nPrinting time: $printingMillis ms\n")
+        print("Total: ${parsingTime + printingMillis}ms \t Parsing time: $parsingTime ms \t printing time: $printingMillis ms\n")
     }
 
 }

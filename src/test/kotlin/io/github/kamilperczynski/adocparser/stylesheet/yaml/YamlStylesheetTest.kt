@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import java.nio.file.Paths
 
 class YamlStylesheetTest {
+
     @Test
     fun `test read yaml stylesheet document`() {
         val yamlStylesheet = parseYamlStylesheet(
@@ -14,7 +15,7 @@ class YamlStylesheetTest {
         )
 
         val stylesheet: AdocStylesheet = YamlAdocStylesheet(
-            Paths.get("/Users/kperczynski/fonties"),
+            Paths.get("./fonts").toAbsolutePath(),
             yamlStylesheet
         )
 
@@ -33,4 +34,5 @@ class YamlStylesheetTest {
             "jetbrainsmono-bolditalic"
         )
     }
+
 }

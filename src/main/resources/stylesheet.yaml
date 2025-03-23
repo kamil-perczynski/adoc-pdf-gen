@@ -7,10 +7,10 @@ font:
       italic: static/JetBrainsMono-Italic.ttf
       boldItalic: static/JetBrainsMono-BoldItalic.ttf
     Ubuntu:
-      normal: Ubuntu-Regular.ttf
-      bold: Ubuntu-Medium.ttf
-      italic: Ubuntu-Italic.ttf
-      boldItalic: Ubuntu-BoldItalic.ttf
+      normal: static/Ubuntu-Regular.ttf
+      bold: static/Ubuntu-Medium.ttf
+      italic: static/Ubuntu-Italic.ttf
+      boldItalic: static/Ubuntu-MediumItalic.ttf
 base:
   fontSize: 11
 sectionTitle:
