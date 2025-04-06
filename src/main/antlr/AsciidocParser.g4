@@ -22,7 +22,7 @@ table: TABLE_MARK table_cell+ TABLE_END;
 table_cell: T_COLSPAN? T_ALIGNMENT? T_FORMAT_MODE? TABLE_CELL_START (T_WORD | T_WS | T_ALIGNMENT | T_INTER | T_COLSPAN | T_FORMAT_MODE | T_EOL)* (T_WORD | T_WS | T_INTER | T_EOL);
 macro: WORD COLON WORD? params;
 
-list_item: ASTERISK WS paragraph_line | DOT WS paragraph_line | LIST_START WS paragraph_line;
+list_item: (ASTERISK | LIST_START | DOT) WS paragraph_line EOL*;
 
 admonition: ADMONITION_INLINE paragraph_line+;
 

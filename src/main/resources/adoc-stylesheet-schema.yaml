@@ -10,21 +10,24 @@ $defs:
         $ref: "#/$defs/ParagraphProps"
       listSymbol:
         type: string
-      preSymbol:
-        type: string
-      postSymbol:
-        type: string
-      isNumbered:
+      numbered:
         type: boolean
         default: false
-      isLettered:
+      lettered:
         type: boolean
         default: false
-      isLowercase:
+      lowercased:
         type: boolean
         default: false
-      isAutoindent:
+      autoIndented:
         type: boolean
+        default: false
+        description: >-
+          If true, the list symbol will be indented to the same level as the
+          text. If false, the list symbol will be indented to the same level as
+          the paragraph.
+      symbolIndent:
+        type: [ string, number ]
       indentationLeft:
         type: [ string, number ]
       indentationRight:
@@ -125,7 +128,17 @@ properties:
       content:
         $ref: "#/$defs/ParagraphProps"
   list:
-    $ref: "#/$defs/ListProps"
-
-  listItem:
-    $ref: "#/$defs/ParagraphProps"
+    type: object
+    properties:
+      paragraph:
+        $ref: "#/$defs/ParagraphProps"
+      defaults:
+        $ref: "#/$defs/ListProps"
+      level1:
+        $ref: "#/$defs/ListProps"
+      level2:
+        $ref: "#/$defs/ListProps"
+      level3:
+        $ref: "#/$defs/ListProps"
+      level4:
+        $ref: "#/$defs/ListProps"

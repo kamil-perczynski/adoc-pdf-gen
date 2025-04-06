@@ -28,7 +28,7 @@ COLON: ':'+;
 ASTERISK: '*'+;
 UNDERSCORE: '_'+;
 ACUTE: '`'+;
-LIST_START: [0-9]+ DOT;
+LIST_START: [0-9]+ DOT | [a-z] DOT | [A-Z] DOT;
 
 ID_START : '[[';
 ID_END : ']]';

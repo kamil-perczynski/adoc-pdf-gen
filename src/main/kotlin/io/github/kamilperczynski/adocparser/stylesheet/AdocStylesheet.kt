@@ -13,7 +13,7 @@ interface AdocStylesheet {
 
     fun styleParagraph(paragraph: Paragraph, adocParagraph: AdocParagraph)
 
-    fun styleListItem(listItem: ListItem, item: AdocListItem, idx: Int)
+    fun styleListItem(listItem: ListItem, item: AdocListItem, nestingLevel: Int)
 
     fun styleHeader(paragraph: Paragraph, adocHeader: AdocHeader)
 
@@ -21,4 +21,10 @@ interface AdocStylesheet {
 
     fun styleAdmonition(heading: Paragraph, content: Paragraph, adocAdmonition: AdocAdmonition)
 
+    fun styleList(pdfList: PdfList, adocList: AdocList, nestingLevel: Int)
+
+    fun styleListWrapper(pdfParagraph: Paragraph, adocList: AdocList)
+
 }
+
+typealias PdfList = com.lowagie.text.List

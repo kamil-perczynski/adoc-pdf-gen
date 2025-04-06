@@ -1,6 +1,7 @@
 package io.github.kamilperczynski.adocparser.ast
 
 import io.github.kamilperczynski.adocparser.AsciidocParser.*
+import io.github.kamilperczynski.adocparser.ast.EmphasisType.*
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.TerminalNode
 import java.net.MalformedURLException
@@ -18,7 +19,7 @@ class AdocTextChunker {
         for ((pos, child) in fn.get().withIndex()) {
             when (child) {
                 is MacroContext -> {
-                    finishChunk()
+                    currentChunk.str.append(child.text)
                     // println("..MACRO..: ${child.text}")
                 }
 
@@ -89,9 +90,9 @@ class AdocTextChunker {
             UNDERSCORE -> {
                 if (!currentChunk.underlineStarted) {
                     finishChunk()
-                    currentChunk.underline()
+                    currentChunk.emphasise(ITALIC)
                 } else {
-                    currentChunk.underline()
+                    currentChunk.emphasise(ITALIC)
                     finishChunk()
                 }
             }
@@ -99,9 +100,9 @@ class AdocTextChunker {
             ASTERISK -> {
                 if (!currentChunk.underlineStarted) {
                     finishChunk()
-                    currentChunk.underline()
+                    currentChunk.emphasise(BOLD)
                 } else {
-                    currentChunk.underline()
+                    currentChunk.emphasise(BOLD)
                     finishChunk()
                 }
             }
@@ -124,21 +125,26 @@ class AdocTextChunker {
 class ChunkBuilder {
     internal val str = StringBuilder()
 
-    var underlineStarted: Boolean = false
+    private var emphasisType: EmphasisType? = null
     private var underlineFinished: Boolean = false
 
+    var underlineStarted: Boolean = false
+
     fun finish(): AdocChunk {
-        if (underlineStarted && underlineFinished) {
-            return AdocChunk(ChunkType.EMPHASIS, str.toString())
+        val currentEmphasisType = emphasisType
+
+        if (underlineStarted && underlineFinished && currentEmphasisType != null) {
+            return AdocChunk(ChunkType.EMPHASIS, str.toString(), currentEmphasisType)
         }
 
-        return AdocChunk(ChunkType.TEXT, str.toString())
+        return AdocChunk(ChunkType.TEXT, str.toString(), NONE)
     }
 
-    fun underline() {
+    fun emphasise(emphasisType: EmphasisType) {
         if (underlineStarted) {
             underlineFinished = true
         } else {
+            this.emphasisType = emphasisType
             underlineStarted = true
         }
     }
