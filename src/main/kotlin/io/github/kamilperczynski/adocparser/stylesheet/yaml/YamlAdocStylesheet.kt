@@ -2,30 +2,20 @@ package io.github.kamilperczynski.adocparser.stylesheet.yaml
 
 import com.lowagie.text.Font
 import com.lowagie.text.FontFactory
+import com.lowagie.text.ListItem
 import com.lowagie.text.Paragraph
-import com.lowagie.text.pdf.BaseFont
-import io.github.kamilperczynski.adocparser.ast.AdocHeader
-import io.github.kamilperczynski.adocparser.ast.AdocParagraph
-import io.github.kamilperczynski.adocparser.ast.AdocSectionTitle
+import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
-import java.awt.Color
+import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlTextAlign.*
 import java.nio.file.Path
 import java.nio.file.Paths
-
-private const val DEFAULT_BASE_FONT_SIZE = 12f
-
-private val FONT_FALLBACK = YamlFontProps(
-    fontFamily = "times-roman",
-    fontSize = "12",
-    fontColor = "#000000",
-    fontStyle = YamlFontStyle.normal,
-    textDecoration = YamlTextDecoration.none
-)
 
 class YamlAdocStylesheet(
     private val fontsDir: Path = Paths.get("."),
     private val yamlStylesheet: YamlStylesheet
 ) : AdocStylesheet {
+
+    private val baseFontProps = FONT_FALLBACK.merge(yamlStylesheet.base)
 
     override fun registerFonts() {
         for (entry in yamlStylesheet.font.catalog) {
@@ -37,40 +27,71 @@ class YamlAdocStylesheet(
     }
 
     override val baseFont: Font
-        get() {
-            val fontProps = FONT_FALLBACK.merge(yamlStylesheet.base)
-            return toFont(fontProps)
-        }
+        get() = toFont(baseFontProps)
 
     override fun styleParagraph(paragraph: Paragraph, adocParagraph: AdocParagraph) {
-        paragraph.font = baseFont
-
-        paragraph.multipliedLeading = 1.25f
-        paragraph.spacingBefore = baseFont.size * .5f
-        paragraph.spacingAfter = baseFont.size * .75f
+        applyParagraphStyles(
+            paragraph,
+            baseFontProps.merge(yamlStylesheet.paragraph.font),
+            PARAGRAPH_FALLBACK.merge(yamlStylesheet.paragraph)
+        )
     }
 
     override fun styleSectionTitle(pdfParagraph: Paragraph, node: AdocSectionTitle) {
-        val fontProps = FONT_FALLBACK
-            .merge(yamlStylesheet.base)
-            .merge(yamlStylesheet.sectionTitle)
+        applyParagraphStyles(
+            pdfParagraph,
+            baseFontProps
+                .merge(yamlStylesheet.paragraph.font)
+                .merge(yamlStylesheet.sectionTitle.font),
+            PARAGRAPH_FALLBACK
+                .merge(yamlStylesheet.paragraph)
+                .merge(yamlStylesheet.sectionTitle)
+        )
+    }
 
-        pdfParagraph.font = toFont(fontProps)
-        pdfParagraph.spacingAfter = baseFont.size * 0.25f
+    private fun applyParagraphStyles(
+        pdfParagraph: Paragraph,
+        paragraphFont: YamlFontProps,
+        paragraphProps: YamlParagraphProps
+    ) {
+
+        pdfParagraph.font = toFont(paragraphFont, baseFont.size)
+        pdfParagraph.leading = paragraphProps.lineHeight?.let { parseUnit(it, baseFont.size) }!!
+        pdfParagraph.spacingBefore = paragraphProps.spacingBefore?.let { parseUnit(it, baseFont.size) }!!
+        pdfParagraph.spacingAfter = paragraphProps.spacingAfter?.let { parseUnit(it, baseFont.size) }!!
+        pdfParagraph.alignment = toTextAlign(paragraphProps.textAlign)
+    }
+
+    override fun styleAdmonition(heading: Paragraph, content: Paragraph, adocAdmonition: AdocAdmonition) {
+        TODO("Not yet implemented")
     }
 
     override fun styleHeader(paragraph: Paragraph, adocHeader: AdocHeader) {
-        val fontProps = FONT_FALLBACK
-            .merge(yamlStylesheet.base)
-            .merge(yamlStylesheet.heading.font)
-            .merge(
-                toHeaderFontProps(adocHeader.level, yamlStylesheet.heading)
-            )
+        val headerProps = toHeaderProps(adocHeader.level, yamlStylesheet.heading)
 
-        paragraph.font = toFont(fontProps)
-        paragraph.multipliedLeading = 1.5f
-        paragraph.spacingAfter = baseFont.size * 1.5f
-        paragraph.spacingBefore = baseFont.size
+        applyParagraphStyles(
+            paragraph,
+            baseFontProps
+                .merge(yamlStylesheet.paragraph.font)
+                .merge(yamlStylesheet.heading.defaults.font)
+                .merge(headerProps?.font),
+            PARAGRAPH_FALLBACK
+                .merge(yamlStylesheet.paragraph)
+                .merge(yamlStylesheet.heading.defaults)
+                .merge(headerProps)
+        )
+    }
+
+    override fun styleListItem(listItem: ListItem, item: AdocListItem, idx: Int) {
+        applyParagraphStyles(
+            listItem,
+            baseFontProps
+                .merge(yamlStylesheet.paragraph.font)
+                .merge(yamlStylesheet.listItem.font),
+            PARAGRAPH_FALLBACK
+                .merge(yamlStylesheet.paragraph)
+                .merge(yamlStylesheet.listItem)
+        )
     }
 
     private fun registerFont(fonts: YamlFontCatalogItem, fontFamily: String) {
@@ -101,79 +122,8 @@ class YamlAdocStylesheet(
     }
 }
 
-private fun toFont(fontProps: YamlFontProps): Font {
-    val familyIndex = Font.getFamilyIndex(fontProps.fontFamily ?: FontFactory.TIMES_ROMAN)
 
-    if (familyIndex != Font.UNDEFINED) {
-        return Font(
-            familyIndex,
-            fontProps.fontSize?.toFloat() ?: DEFAULT_BASE_FONT_SIZE,
-            toFontStyle(fontProps) ?: Font.NORMAL,
-            toColor(fontProps.fontColor)
-        )
-    }
-
-    val fontName = when (fontProps.fontStyle ?: YamlFontStyle.normal) {
-        YamlFontStyle.bold -> fontProps.fontFamily + "-bold"
-        YamlFontStyle.italic -> fontProps.fontFamily + "-italic"
-        YamlFontStyle.boldItalic -> fontProps.fontFamily + "-bolditalic"
-        else -> fontProps.fontFamily
-    }
-
-    val fontStyle = if (FontFactory.isRegistered(fontName))
-        Font.NORMAL
-    else
-        toFontStyle(fontProps) ?: Font.NORMAL
-
-    return FontFactory.getFont(
-        fontName,
-        BaseFont.WINANSI,
-        true,
-        fontProps.fontSize?.toFloat() ?: DEFAULT_BASE_FONT_SIZE,
-        fontStyle,
-        toColor(fontProps.fontColor)
-    )
-}
-
-fun toFontStyle(fontProps: YamlFontProps): Int? {
-    if (fontProps.fontStyle == null) {
-        return null
-    }
-
-    var style: Int = Font.NORMAL
-
-    if (fontProps.fontStyle == YamlFontStyle.bold) {
-        style = style or Font.BOLD
-    }
-    if (fontProps.fontStyle == YamlFontStyle.italic) {
-        style = style or Font.ITALIC
-    }
-    if (fontProps.fontStyle == YamlFontStyle.boldItalic) {
-        style = style or Font.BOLDITALIC
-    }
-    if (fontProps.textDecoration == YamlTextDecoration.underline) {
-        style = style or Font.UNDERLINE
-    }
-    if (fontProps.textDecoration == YamlTextDecoration.linethrough) {
-        style = style or Font.STRIKETHRU
-    }
-
-    return style
-}
-
-fun toColor(hexColor: String?): Color? {
-    if (hexColor == null) {
-        return null
-    }
-
-    val r = Integer.valueOf(hexColor.substring(1, 3), 16)
-    val g = Integer.valueOf(hexColor.substring(3, 5), 16)
-    val b = Integer.valueOf(hexColor.substring(5, 7), 16)
-
-    return Color(r, g, b)
-}
-
-private fun toHeaderFontProps(headerLevel: Int, headingProps: YamlHeadingProperties): YamlFontProps? {
+private fun toHeaderProps(headerLevel: Int, headingProps: YamlHeadingProperties): YamlParagraphProps? {
     return when (headerLevel) {
         1 -> headingProps.h1
         2 -> headingProps.h2
@@ -182,5 +132,15 @@ private fun toHeaderFontProps(headerLevel: Int, headingProps: YamlHeadingPropert
         5 -> headingProps.h5
         else -> null
 
+    }
+}
+
+private fun toTextAlign(textAlign: YamlTextAlign?): Int {
+    return when (textAlign) {
+        left -> Paragraph.ALIGN_LEFT
+        center -> Paragraph.ALIGN_CENTER
+        right -> Paragraph.ALIGN_RIGHT
+        justify -> Paragraph.ALIGN_JUSTIFIED
+        else -> Paragraph.ALIGN_LEFT
     }
 }

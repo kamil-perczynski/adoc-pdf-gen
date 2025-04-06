@@ -25,7 +25,7 @@ class AdocPdf(stylesheet: AdocStylesheet) {
         PdfTablePrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
 
     private val blockPrinter = PdfBlockPrinter(document, monospaceFont)
-    private val listPrinter = PdfListPrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
+    private val listPrinter = PdfListPrinter(document, stylesheet, pdfParagraphPrinter)
     private val admonitionPrinter = AdmonitionPrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
 
     fun print(ast: AdocAST, out: OutputStream) {

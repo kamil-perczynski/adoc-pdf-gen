@@ -12,17 +12,40 @@ font:
       italic: static/Ubuntu-Italic.ttf
       boldItalic: static/Ubuntu-MediumItalic.ttf
 base:
-  fontSize: 11
-sectionTitle:
-  fontStyle: boldItalic
+  fontSize: 12
+paragraph:
+  lineHeight: 1.25rem
+  spacingBefore: .625rem
+  spacingAfter: .625rem
+  textAlign: left
 heading:
-  font:
-    fontFamily: ubuntu
-    fontStyle: bold
-    textDecoration: none
+  defaults:
+    font:
+      fontFamily: ubuntu
+      fontStyle: bold
+      textDecoration: none
+    lineHeight: 1.5rem
+    spacingBefore: 1rem
+    spacingAfter: 1rem
+    textAlign: left
   h1:
-    fontSize: 24
+    font:
+      fontSize: 2.25rem
   h2:
-    fontSize: 20
+    font:
+      fontSize: 2rem
   h3:
-    fontSize: 16
+    font:
+      fontSize: 1.25rem
+admonition:
+  heading:
+    textAlign: center
+sectionTitle:
+  font:
+    fontStyle: boldItalic
+  spacingBefore: 1rem
+  spacingAfter: .25rem
+  textAlign: left
+listItem:
+  spacingAfter: .5rem
+  spacingBefore: 0
