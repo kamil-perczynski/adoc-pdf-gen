@@ -5,6 +5,7 @@ import io.github.kamilperczynski.adocparser.ast.AdmonitionType.IMPORTANT
 import io.github.kamilperczynski.adocparser.ast.AdmonitionType.NOTE
 import io.github.kamilperczynski.adocparser.ast.ChunkType.EMPHASIS
 import io.github.kamilperczynski.adocparser.ast.ChunkType.TEXT
+import io.github.kamilperczynski.adocparser.ast.EmphasisType.BOLD
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -35,7 +36,7 @@ class AdmonitionParserTest {
                 AdocParagraph(
                     listOf(
                         AdocChunk(TEXT, "This section "),
-                        AdocChunk(EMPHASIS, "explains"),
+                        AdocChunk(EMPHASIS, "explains", BOLD),
                         AdocChunk(TEXT, " some concepts. ")
                     )
                 )

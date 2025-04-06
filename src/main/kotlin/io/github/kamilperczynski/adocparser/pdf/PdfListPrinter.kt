@@ -1,9 +1,12 @@
 package io.github.kamilperczynski.adocparser.pdf
 
-import com.lowagie.text.*
+import com.lowagie.text.Document
 import com.lowagie.text.List
+import com.lowagie.text.ListItem
+import com.lowagie.text.Paragraph
 import io.github.kamilperczynski.adocparser.ast.AdocList
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import java.util.*
 
 class PdfListPrinter(
     private val document: Document,
@@ -11,54 +14,78 @@ class PdfListPrinter(
     private val pdfParagraphPrinter: PdfParagraphPrinter
 ) {
 
-    fun printList(node: AdocList) {
-        val rootList = nextList()
+    fun printList(adocList: AdocList) {
+        val rootList = nextList(stylesheet, adocList, 1)
 
-        val listsIdx = arrayOfNulls<List>(20)
-        listsIdx[0] = rootList
+        val listsStack = ListsStack(rootList)
 
-        for ((idx, item) in node.items.withIndex()) {
-            val list = provideNestedList(listsIdx, item.level)
+        for (item in adocList.items) {
+            val nestedList =
+                if (item.level > listsStack.currentLevel)
+                    listsStack.addUntil(item.level) { nestingLevel ->
+                        nextList(stylesheet, adocList, nestingLevel)
+                    }
+                else
+                    listsStack.popUntil(item.level)
 
             val listItem = ListItem()
-            stylesheet.styleListItem(listItem, item, idx)
+            stylesheet.styleListItem(listItem, item, item.level)
 
             pdfParagraphPrinter.printPhraseChunks(item.paragraph.chunks, listItem)
-            list.add(listItem)
+            nestedList.add(listItem)
         }
 
-        // TODO: should this be styled with custom rule?
-        val paragraph = Paragraph()
-        paragraph.add(rootList)
-        paragraph.spacingBefore = stylesheet.baseFont.size * 0.75f
-        paragraph.spacingAfter = stylesheet.baseFont.size * 0.75f
+        listsStack.popUntil(1)
 
+        val paragraph = Paragraph()
+        stylesheet.styleListWrapper(paragraph, adocList)
+
+        paragraph.add(rootList)
         document.add(paragraph)
     }
 
-    private fun provideNestedList(listsIdx: Array<List?>, itemLevel: Int): List {
-        val neededList = listsIdx[itemLevel - 1]
-
-        if (neededList != null) {
-            return neededList
-        }
-
-        val parentList = provideNestedList(listsIdx, itemLevel - 1)
-
-        val nestedList = nextList()
-        parentList.add(nestedList)
-
-        listsIdx[itemLevel] = nestedList
-
-        return nestedList
-    }
-
-    private fun nextList(): List {
+    private fun nextList(stylesheet: AdocStylesheet, list: AdocList, level: Int): List {
         val pdfList = List()
-        pdfList.isAutoindent = false
-        pdfList.symbolIndent = stylesheet.baseFont.size
-
-        pdfList.setListSymbol(Chunk("\u2022", stylesheet.baseFont))
+        stylesheet.styleList(pdfList, list, level)
         return pdfList
     }
+}
+
+class ListsStack(rootList: List) {
+    private val stack = LinkedList<Pair<Int, List>>()
+        .also { it.add(1 to rootList) }
+
+    val currentLevel
+        get() = stack.peekFirst().first
+
+    fun addUntil(level: Int, fn: (Int) -> List): List {
+        val currentLevel = stack.peekFirst().first
+
+        if (currentLevel == level) {
+            return stack.peekFirst().second
+        }
+
+        for (i in currentLevel until level) {
+            stack.addFirst(i + 1 to fn(i + 1))
+        }
+
+        return stack.peekFirst().second
+    }
+
+    fun popUntil(level: Int): List {
+        val currentLevel = stack.peekFirst()
+
+        if (currentLevel.first == level) {
+            return currentLevel.second
+        }
+
+        for (i in currentLevel.first downTo level + 1) {
+            val lastEl = stack.removeFirst()
+
+            stack.peekFirst().second.add(lastEl.second)
+        }
+
+        return stack.peekFirst().second
+    }
+
 }

@@ -4,6 +4,7 @@ import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.ast.AdmonitionType.*
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.tree.TerminalNode
 
 class AdocParser(adoc: String) {
 
@@ -13,10 +14,10 @@ class AdocParser(adoc: String) {
         val ast = AdocAST()
 
         for (child in parser.doc().section()) {
-            val admonitionSectionType = if (child.ADMONITION_LINE().isNotEmpty())
-                toAdmonitionType(child.ADMONITION_LINE().first().text.trim())
-            else null
-
+            val admonitionSectionType =
+                if (child.ADMONITION_LINE().isNotEmpty())
+                    toAdmonitionType(child.ADMONITION_LINE().first().text.trim())
+                else null
 
             if (child.section_title().isNotEmpty()) {
                 val chunks = AdocTextChunker()
@@ -32,8 +33,7 @@ class AdocParser(adoc: String) {
                 val admonitionType = toAdmonitionTypeInlineToken(admonition.ADMONITION_INLINE().text.trim())
 
                 ast.push(AdocAdmonition(admonitionType, paragraph))
-            }
-            else if (child.paragraph_line().isNotEmpty()) {
+            } else if (child.paragraph_line().isNotEmpty()) {
                 val paragraph = toAdocParagraph(child.paragraph_line())
 
                 if (admonitionSectionType != null) {
@@ -51,8 +51,7 @@ class AdocParser(adoc: String) {
 
                 if (admonitionSectionType == null) {
                     blockParser.parse(child.block())
-                }
-                else {
+                } else {
                     blockParser.parseAdmonitionBlock(child.block(), admonitionSectionType)
                 }
 
@@ -62,11 +61,20 @@ class AdocParser(adoc: String) {
                 for (listItem in child.list_item()) {
                     val level = listItem.children.first().text.length
 
+                    val listTypeToken = listItem.children.first() as TerminalNode
+
                     val paragraph = AdocTextChunker()
                         .parseLine { listItem.paragraph_line().children }
                         .finishParagraph()
 
-                    listItems.add(AdocListItem(level, paragraph))
+                    val adocListItem = AdocListItem(
+                        level = level,
+                        paragraph = paragraph,
+                        numbered = isNumberedList(listTypeToken),
+                        lettered = isLetteredList(listTypeToken),
+                        lowercased = isLowercaseList(listTypeToken)
+                    )
+                    listItems.add(adocListItem)
                 }
 
                 ast.push(AdocList(listItems))
@@ -75,7 +83,17 @@ class AdocParser(adoc: String) {
 
         return ast
     }
+
 }
+
+private fun isNumberedList(listTypeToken: TerminalNode) =
+    listTypeToken.text.endsWith('.')
+
+private fun isLetteredList(listTypeToken: TerminalNode) =
+    listTypeToken.text[0].isLetter()
+
+private fun isLowercaseList(listTypeToken: TerminalNode) =
+    listTypeToken.text[0].isLowerCase()
 
 internal fun toAdocParagraph(paragraphLines: List<AsciidocParser.Paragraph_lineContext>): AdocParagraph {
     val paragraphParser = AdocTextChunker()
@@ -106,6 +124,7 @@ fun toAdmonitionType(type: String): AdmonitionType {
         else -> throw IllegalArgumentException("Unknown admonition type: $type")
     }
 }
+
 fun toAdmonitionTypeInlineToken(type: String): AdmonitionType {
     return when (type) {
         "NOTE:" -> NOTE

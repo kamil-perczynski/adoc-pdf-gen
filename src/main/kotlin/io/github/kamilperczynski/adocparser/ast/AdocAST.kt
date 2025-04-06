@@ -23,12 +23,19 @@ data class AdocHeader(
 data class AdocId(val id: String) : AdocNode
 
 data class AdocList(val items: List<AdocListItem>) : AdocNode
-data class AdocListItem(val level: Int, val paragraph: AdocParagraph)
+
+data class AdocListItem(
+    val level: Int,
+    val paragraph: AdocParagraph,
+    val numbered: Boolean,
+    val lettered: Boolean,
+    val lowercased: Boolean
+)
 
 data class AdocParagraph(val chunks: List<AdocChunk>) : AdocNode
 data class AdocBlock(val lines: List<AdocChunk>) : AdocNode
 
-data class AdocChunk(val type: ChunkType, val text: String)
+data class AdocChunk(val type: ChunkType, val text: String, val emphasis: EmphasisType = EmphasisType.NONE)
 data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 
 data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode
@@ -54,3 +61,11 @@ enum class AdmonitionType {
     DANGER,
     ERROR
 }
+
+enum class EmphasisType {
+    NONE,
+    BOLD,
+    ITALIC,
+    BOLD_ITALIC
+}
+

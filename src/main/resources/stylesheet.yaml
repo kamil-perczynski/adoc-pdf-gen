@@ -49,3 +49,26 @@ sectionTitle:
 listItem:
   spacingAfter: .5rem
   spacingBefore: 0
+list:
+  paragraph:
+    spacingBefore: .75rem
+    spacingAfter: .75rem
+  defaults:
+    symbolIndent: 1rem
+    indentationLeft: .5rem
+    paragraph:
+      spacingBefore: .25rem
+      spacingAfter: .25rem
+  level1:
+    listSymbol: "•   "
+  level2:
+    listSymbol: "◦   "
+    numbered: false
+    lettered: true
+    lowercased: true
+    autoIndented: true
+  level3:
+    listSymbol: "▪   "
+    numbered: false
+    lettered: false
+    autoIndented: true

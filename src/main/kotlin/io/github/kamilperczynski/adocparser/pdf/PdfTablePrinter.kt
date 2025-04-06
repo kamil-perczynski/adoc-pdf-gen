@@ -26,7 +26,7 @@ class PdfTablePrinter(
 
         for ((idx, col) in node.cols.withIndex()) {
             val pdfPCell = PdfPCell()
-            pdfPCell.setPadding(baseFont.size)
+            pdfPCell.setPadding(baseFont.size * .75f)
             pdfPCell.paddingTop = 0f
 
             if (idx < node.colsCount) {

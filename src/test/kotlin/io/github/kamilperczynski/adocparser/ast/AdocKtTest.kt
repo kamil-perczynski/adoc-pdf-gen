@@ -2,6 +2,8 @@ package io.github.kamilperczynski.adocparser.ast
 
 import io.github.kamilperczynski.adocparser.AdocParser
 import io.github.kamilperczynski.adocparser.ast.ChunkType.*
+import io.github.kamilperczynski.adocparser.ast.EmphasisType.BOLD
+import io.github.kamilperczynski.adocparser.ast.EmphasisType.ITALIC
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -25,9 +27,9 @@ class AdocKtTest {
             AdocParagraph(
                 listOf(
                     AdocChunk(TEXT, "This is a "),
-                    AdocChunk(EMPHASIS, "bold"),
+                    AdocChunk(EMPHASIS, "bold", BOLD),
                     AdocChunk(TEXT, " statement, and this is "),
-                    AdocChunk(EMPHASIS, "italicized"),
+                    AdocChunk(EMPHASIS, "italicized", ITALIC),
                     AdocChunk(TEXT, ". ")
                 )
             )

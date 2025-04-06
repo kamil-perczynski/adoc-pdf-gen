@@ -5,6 +5,7 @@ import io.github.kamilperczynski.adocparser.ast.AdocChunk
 import io.github.kamilperczynski.adocparser.ast.AdocParagraph
 import io.github.kamilperczynski.adocparser.ast.AdocSectionTitle
 import io.github.kamilperczynski.adocparser.ast.ChunkType.*
+import io.github.kamilperczynski.adocparser.ast.EmphasisType.*
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
 import java.awt.Color
 
@@ -42,7 +43,15 @@ class PdfParagraphPrinter(
                 }
 
                 EMPHASIS -> {
-                    val emphasisFont = Font(paragraph.font).apply { style = Font.BOLD }
+                    val emphasisFont = Font(paragraph.font)
+
+                    emphasisFont.style = when (chunk.emphasis) {
+                        ITALIC -> Font.ITALIC
+                        BOLD -> Font.BOLD
+                        BOLD_ITALIC -> Font.BOLDITALIC
+                        NONE -> Font.NORMAL
+                    }
+
                     paragraph.add(Chunk(chunk.text, emphasisFont))
                 }
 

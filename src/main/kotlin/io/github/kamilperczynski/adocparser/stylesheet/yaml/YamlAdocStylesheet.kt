@@ -1,11 +1,9 @@
 package io.github.kamilperczynski.adocparser.stylesheet.yaml
 
-import com.lowagie.text.Font
-import com.lowagie.text.FontFactory
-import com.lowagie.text.ListItem
-import com.lowagie.text.Paragraph
+import com.lowagie.text.*
 import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.PdfList
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlTextAlign.*
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -82,15 +80,78 @@ class YamlAdocStylesheet(
         )
     }
 
-    override fun styleListItem(listItem: ListItem, item: AdocListItem, idx: Int) {
+    override fun styleListItem(listItem: ListItem, item: AdocListItem, nestingLevel: Int) {
+        val paragraphProps = PARAGRAPH_FALLBACK
+            .merge(yamlStylesheet.paragraph)
+            .merge(yamlStylesheet.list.defaults.paragraph)
+            .merge(
+                when (nestingLevel) {
+                    1 -> yamlStylesheet.list.level1.paragraph
+                    2 -> yamlStylesheet.list.level2.paragraph
+                    3 -> yamlStylesheet.list.level3.paragraph
+                    4 -> yamlStylesheet.list.level4.paragraph
+                    else -> yamlStylesheet.list.level4.paragraph
+                }
+            )
+
         applyParagraphStyles(
             listItem,
-            baseFontProps
+            FONT_FALLBACK
                 .merge(yamlStylesheet.paragraph.font)
-                .merge(yamlStylesheet.listItem.font),
+                .merge(yamlStylesheet.list.defaults.paragraph.font)
+                .merge(paragraphProps.font),
+            paragraphProps
+        )
+    }
+
+    override fun styleList(pdfList: PdfList, adocList: AdocList, nestingLevel: Int) {
+        val firstItem = adocList.items.first()
+
+        val listProps = LIST_FALLBACK
+            .merge(yamlStylesheet.list.defaults)
+            .merge(
+                when (nestingLevel) {
+                    1 -> yamlStylesheet.list.level1
+                    2 -> yamlStylesheet.list.level2
+                    3 -> yamlStylesheet.list.level3
+                    4 -> yamlStylesheet.list.level4
+                    else -> yamlStylesheet.list.level4
+                }
+            )
+
+        val fontProps = FONT_FALLBACK
+            .merge(yamlStylesheet.paragraph.font)
+            .merge(yamlStylesheet.list.defaults.paragraph.font)
+            .merge(listProps.paragraph.font)
+
+        pdfList.isAutoindent = true
+        pdfList.isLettered = listProps.lettered ?: firstItem.lettered
+        pdfList.isLowercase = listProps.lowercased ?: firstItem.lowercased
+        pdfList.isNumbered = listProps.numbered ?: firstItem.numbered
+
+        pdfList.setListSymbol(Chunk(listProps.listSymbol, toFont(fontProps)))
+
+        pdfList.indentationLeft =
+            listProps.indentationLeft?.let { parseUnit(it, baseFont.size) }
+                ?: pdfList.indentationLeft
+
+        pdfList.indentationRight =
+            listProps.indentationRight?.let { parseUnit(it, baseFont.size) }
+                ?: pdfList.indentationRight
+
+        pdfList.symbolIndent = listProps.symbolIndent?.let { parseUnit(it, baseFont.size) }
+            ?: pdfList.symbolIndent
+    }
+
+    override fun styleListWrapper(pdfParagraph: Paragraph, adocList: AdocList) {
+        applyParagraphStyles(
+            pdfParagraph,
+            FONT_FALLBACK
+                .merge(yamlStylesheet.paragraph.font)
+                .merge(yamlStylesheet.list.defaults.paragraph.font),
             PARAGRAPH_FALLBACK
                 .merge(yamlStylesheet.paragraph)
-                .merge(yamlStylesheet.listItem)
+                .merge(yamlStylesheet.list.defaults.paragraph)
         )
     }
 

@@ -5,10 +5,10 @@ data class YamlStylesheet(
     var font: YamlFontCatalog = YamlFontCatalog(),
     var base: YamlFontProps? = null,
     var sectionTitle: YamlParagraphProps = YamlParagraphProps(),
-    var listItem: YamlParagraphProps = YamlParagraphProps(),
     var heading: YamlHeadingProperties = YamlHeadingProperties(),
     var paragraph: YamlParagraphProps = YamlParagraphProps(),
     var admonition: YamlAdmonitionProperties = YamlAdmonitionProperties(),
+    var list: YamlListsProps = YamlListsProps(),
 )
 
 data class YamlFontCatalog(
@@ -17,6 +17,45 @@ data class YamlFontCatalog(
      */
     var catalog: Map<String, YamlFontCatalogItem> = mutableMapOf()
 )
+
+data class YamlListsProps(
+    var paragraph: YamlParagraphProps = YamlParagraphProps(),
+    var defaults: YamlListProps = YamlListProps(),
+    var level1: YamlListProps = YamlListProps(),
+    var level2: YamlListProps = YamlListProps(),
+    var level3: YamlListProps = YamlListProps(),
+    var level4: YamlListProps = YamlListProps()
+)
+
+data class YamlListProps(
+    var paragraph: YamlParagraphProps = YamlParagraphProps(),
+    var listSymbol: String? = null,
+    var numbered: Boolean? = null,
+    var lettered: Boolean? = null,
+    var lowercased: Boolean? = null,
+    var autoIndented: Boolean? = null,
+    var symbolIndent: String? = null,
+    var indentationLeft: String? = null,
+    var indentationRight: String? = null
+) {
+    fun merge(other: YamlListProps?): YamlListProps {
+        if (other == null) {
+            return this
+        }
+
+        return YamlListProps(
+            paragraph = other.paragraph.merge(paragraph),
+            listSymbol = other.listSymbol ?: listSymbol,
+            numbered = other.numbered ?: numbered,
+            lettered = other.lettered ?: lettered,
+            lowercased = other.lowercased ?: lowercased,
+            autoIndented = other.autoIndented ?: autoIndented,
+            symbolIndent = other.symbolIndent ?: symbolIndent,
+            indentationLeft = other.indentationLeft ?: indentationLeft,
+            indentationRight = other.indentationRight ?: indentationRight
+        )
+    }
+}
 
 data class YamlFontCatalogItem(
     var normal: String? = null,

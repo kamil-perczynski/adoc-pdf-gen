@@ -45,7 +45,7 @@ tasks.named<Test>("test") {
     testLogging {
         showStandardStreams = true
 
-        events("passed", "skipped", "failed")
+        events("skipped", "failed")
     }
 }
 
