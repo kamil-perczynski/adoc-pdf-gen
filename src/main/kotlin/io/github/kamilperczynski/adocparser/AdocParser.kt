@@ -79,6 +79,9 @@ class AdocParser(adoc: String) {
 
                 ast.push(AdocList(listItems))
             }
+            else if (child.page_break() != null) {
+                ast.push(AdocPageBreak())
+            }
         }
 
         return ast

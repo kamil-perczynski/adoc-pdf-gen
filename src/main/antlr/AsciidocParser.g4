@@ -15,8 +15,10 @@ comment: DOUBLE_SLASH ~EOL* EOL;
 header : HEADER_START (id | ~EOL)+ EOL;
 
 section:
- (param_line+ | comment+ | section_title+ | ADMONITION_LINE+ | EOL+)*  (list_item+ | id_line | attribute+ | header | block | paragraph_line+ | table | admonition)
+ (param_line+ | comment+ | section_title+ | ADMONITION_LINE+ | EOL+)*  (page_break | list_item+ | id_line | attribute+ | header | block | paragraph_line+ | table | admonition)
 ;
+
+page_break: PAGE_BREAK WS* EOL;
 
 table: TABLE_MARK table_cell+ TABLE_END;
 table_cell: T_COLSPAN? T_ALIGNMENT? T_FORMAT_MODE? TABLE_CELL_START (T_WORD | T_WS | T_ALIGNMENT | T_INTER | T_COLSPAN | T_FORMAT_MODE | T_EOL)* (T_WORD | T_WS | T_INTER | T_EOL);
@@ -39,7 +41,7 @@ section_title : DOT ~WS ~(DOT | EOL)* EOL;
 attribute: COLON WORD COLON (WS ~EOL*)? EOL;
 
 paragraph_line :
-  (macro | link | WORD | WS | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | INTER | ASTERISK)
-  (macro | link | params | WORD | WS | ID_START | ID_END | DOT | HEADER_START | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | COLON | LIST_START | INTER | ASTERISK)*
+  (macro | link | WORD | WS | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | INTER | ASTERISK | PAGE_BREAK)
+  (macro | link | params | WORD | WS | ID_START | ID_END | DOT | HEADER_START | ESCAPED_CHAR | DOUBLE_SLASH | UNDERSCORE | ACUTE | COLON | LIST_START | INTER | ASTERISK | PAGE_BREAK)*
   EOL
 ;
