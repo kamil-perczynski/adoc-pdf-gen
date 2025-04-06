@@ -4,8 +4,11 @@ package io.github.kamilperczynski.adocparser.stylesheet.yaml
 data class YamlStylesheet(
     var font: YamlFontCatalog = YamlFontCatalog(),
     var base: YamlFontProps? = null,
-    var sectionTitle: YamlFontProps? = null,
+    var sectionTitle: YamlParagraphProps = YamlParagraphProps(),
+    var listItem: YamlParagraphProps = YamlParagraphProps(),
     var heading: YamlHeadingProperties = YamlHeadingProperties(),
+    var paragraph: YamlParagraphProps = YamlParagraphProps(),
+    var admonition: YamlAdmonitionProperties = YamlAdmonitionProperties(),
 )
 
 data class YamlFontCatalog(
@@ -28,7 +31,6 @@ data class YamlFontProps(
     var fontColor: String? = null,
     var fontStyle: YamlFontStyle? = null,
     var textDecoration: YamlTextDecoration? = null,
-    var textAlign: YamlTextAlign? = null
 ) {
     fun merge(props: YamlFontProps?): YamlFontProps {
         if (props == null) {
@@ -41,7 +43,6 @@ data class YamlFontProps(
             fontColor = props.fontColor ?: fontColor,
             fontStyle = props.fontStyle ?: fontStyle,
             textDecoration = props.textDecoration ?: textDecoration,
-            textAlign = props.textAlign ?: textAlign
         )
     }
 }
@@ -68,11 +69,59 @@ enum class YamlFontStyle(var value: String) {
 }
 
 data class YamlHeadingProperties(
-    var font: YamlFontProps? = null,
-    var h1: YamlFontProps? = null,
-    var h2: YamlFontProps? = null,
-    var h3: YamlFontProps? = null,
-    var h4: YamlFontProps? = null,
-    var h5: YamlFontProps? = null,
-    var h6: YamlFontProps? = null
+    var defaults: YamlParagraphProps = YamlParagraphProps(),
+    var h1: YamlParagraphProps = YamlParagraphProps(),
+    var h2: YamlParagraphProps = YamlParagraphProps(),
+    var h3: YamlParagraphProps = YamlParagraphProps(),
+    var h4: YamlParagraphProps = YamlParagraphProps(),
+    var h5: YamlParagraphProps = YamlParagraphProps(),
+    var h6: YamlParagraphProps = YamlParagraphProps()
 )
+
+data class YamlAdmonitionProperties(
+    var text: YamlParagraphProps? = null,
+    var heading: YamlParagraphProps? = null,
+)
+
+data class YamlParagraphProps(
+    var font: YamlFontProps? = null,
+    var lineHeight: String? = null,
+    var spacingBefore: String? = null,
+    var spacingAfter: String? = null,
+    var firstLineIndent: String? = null,
+    var textAlign: YamlTextAlign? = null
+) {
+    fun merge(paragraph: YamlParagraphProps?): YamlParagraphProps {
+        if (paragraph == null) {
+            return this
+        }
+
+        return YamlParagraphProps(
+            font = paragraph.font ?: font,
+            lineHeight = paragraph.lineHeight ?: lineHeight,
+            spacingBefore = paragraph.spacingBefore ?: spacingBefore,
+            spacingAfter = paragraph.spacingAfter ?: spacingAfter,
+            firstLineIndent = paragraph.firstLineIndent ?: firstLineIndent,
+            textAlign = paragraph.textAlign ?: textAlign
+        )
+    }
+}
+
+fun parseUnit(value: String?, baseFontSize: Float): Float? {
+    if (value == null) {
+        return null
+    }
+
+    try {
+        val trimmed = value.trim()
+
+        if (trimmed.endsWith("rem")) {
+            val digits = trimmed.substringBefore("rem")
+            return digits.toFloat() * baseFontSize
+        }
+
+        return trimmed.toFloat()
+    } catch (e: NumberFormatException) {
+        throw IllegalArgumentException("Invalid value for font size: $value. Only floats and rems are allowed", e)
+    }
+}

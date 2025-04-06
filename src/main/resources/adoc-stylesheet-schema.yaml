@@ -3,6 +3,54 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 title: "AdocStylesheetSchema"
 type: "object"
 $defs:
+  ListProps:
+    type: object
+    properties:
+      paragraph:
+        $ref: "#/$defs/ParagraphProps"
+      listSymbol:
+        type: string
+      preSymbol:
+        type: string
+      postSymbol:
+        type: string
+      isNumbered:
+        type: boolean
+        default: false
+      isLettered:
+        type: boolean
+        default: false
+      isLowercase:
+        type: boolean
+        default: false
+      isAutoindent:
+        type: boolean
+      indentationLeft:
+        type: [ string, number ]
+      indentationRight:
+        type: [ string, number ]
+  TextAlign:
+    type: string
+    enum: [ "left", "center", "right", "justify" ]
+  ParagraphProps:
+    type: object
+    properties:
+      font:
+        $ref: "#/$defs/FontProperties"
+      lineHeight:
+        type: [ string, number ]
+        default: "1rem"
+      spacingBefore:
+        type: [ string, number ]
+        default: "1rem"
+      spacingAfter:
+        type: [ string, number ]
+        default: "1rem"
+      textAlign:
+        $ref: "#/$defs/TextAlign"
+      firstLineIndent:
+        type: [ string, number ]
+        default: "1rem"
   FontCatalogItem:
     type: "object"
     properties:
@@ -33,10 +81,9 @@ $defs:
       textDecoration:
         type: string
         enum: [ "none", "underline", "line-through", "overline" ]
-      align:
-        type: string
-        enum: [ "left", "center", "right", "justify" ]
 properties:
+  sectionTitle:
+    $ref: "#/$defs/ParagraphProps"
   font:
     type: "object"
     properties:
@@ -45,25 +92,40 @@ properties:
         $ref: "#/$defs/FontCatalog"
   base:
     $ref: "#/$defs/FontProperties"
-  sectionTitle:
-    $ref: "#/$defs/FontProperties"
   heading:
     description: >-
       Font properties for headings. 
       The properties defined here are the default values for all headings.
     type: object
     properties:
-      font:
-        $ref: "#/$defs/FontProperties"
+      defaults:
+        $ref: "#/$defs/ParagraphProps"
       h1:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
       h2:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
       h3:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
       h4:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
       h5:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
       h6:
-        $ref: "#/$defs/FontProperties"
+        $ref: "#/$defs/ParagraphProps"
+  paragraph:
+    $ref: "#/$defs/ParagraphProps"
+  admonition:
+    type: object
+    description: >-
+      Font properties for admonitions. 
+      The properties defined here are the default values for all admonitions.
+    properties:
+      heading:
+        $ref: "#/$defs/ParagraphProps"
+      content:
+        $ref: "#/$defs/ParagraphProps"
+  list:
+    $ref: "#/$defs/ListProps"
+
+  listItem:
+    $ref: "#/$defs/ParagraphProps"
