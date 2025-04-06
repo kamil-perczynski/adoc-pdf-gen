@@ -18,6 +18,8 @@ HEADER_START : '='+ ' ';
 
 TABLE_MARK : ('|===' EOL) -> pushMode(M_TABLE);
 
+PAGE_BREAK : '<<<';
+
 WORD : [a-zA-Z0-9]+ ((INTER | UNDERSCORE) [a-zA-Z0-9]+)*;
 
 ADMONITION_LINE: ('[NOTE]' | '[TIP]' | '[IMPORTANT]' | '[CAUTION]' | '[WARNING]') EOL;

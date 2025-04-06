@@ -44,6 +44,9 @@ class AdocPdf(stylesheet: AdocStylesheet) {
                 is AdocList -> listPrinter.printList(node)
                 is AdocTable -> tablePrinter.printTable(node)
                 is AdocAdmonition -> admonitionPrinter.printAdmonition(node)
+                is AdocPageBreak -> {
+                    document.newPage()
+                }
             }
         }
 

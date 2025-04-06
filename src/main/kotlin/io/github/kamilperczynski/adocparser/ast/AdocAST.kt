@@ -41,6 +41,22 @@ data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode
 data class AdocAdmonition(val admonitionType: AdmonitionType, val paragraph: AdocParagraph) : AdocNode
 
+class AdocPageBreak: AdocNode {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AdocPageBreak) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
+    override fun toString(): String {
+        return "AdocPageBreak()"
+    }
+}
+
 data class AdocTableCol(
     val chunks: List<AdocChunk>,
     val colspan: String? = null,

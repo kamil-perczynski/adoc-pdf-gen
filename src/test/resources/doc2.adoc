@@ -227,6 +227,8 @@ tylesheet=rocket-panda.css -a stylesdir=./resources/stylesheets er.adoc
 
 For further information, please consult https://github.com/asciidoctor/asciidoctor-bibtex.
 
+<<<
+
 [[ExampleClause]]
 == Example Clause
 
@@ -421,6 +423,9 @@ tylesheet=rocket-panda.css -a stylesdir=./resources/stylesheets er.adoc
 ====
 
 For further information, please consult https://github.com/asciidoctor/asciidoctor-bibtex.
+
+[page-layout=landscape]
+<<<
 
 [[ExampleClause]]
 == Example Clause
