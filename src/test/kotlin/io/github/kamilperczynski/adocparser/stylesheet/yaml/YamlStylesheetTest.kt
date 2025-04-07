@@ -2,6 +2,7 @@ package io.github.kamilperczynski.adocparser.stylesheet.yaml
 
 import com.lowagie.text.FontFactory
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.HashmapFontsCache
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.file.Paths
@@ -16,7 +17,8 @@ class YamlStylesheetTest {
 
         val stylesheet: AdocStylesheet = YamlAdocStylesheet(
             Paths.get("./fonts").toAbsolutePath(),
-            yamlStylesheet
+            yamlStylesheet,
+            HashmapFontsCache()
         )
 
         stylesheet.registerFonts()

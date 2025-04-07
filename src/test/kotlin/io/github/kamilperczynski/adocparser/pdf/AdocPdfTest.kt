@@ -3,6 +3,7 @@ package io.github.kamilperczynski.adocparser.pdf
 import io.github.kamilperczynski.adocparser.AdocParser
 import io.github.kamilperczynski.adocparser.ast.AdocAST
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.HashmapFontsCache
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlAdocStylesheet
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.parseYamlStylesheet
 import org.assertj.core.api.Assertions.assertThat
@@ -63,9 +64,11 @@ class AdocPdfTest {
             this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!
         )
 
+        val fontsCache = HashmapFontsCache()
         val stylesheet: AdocStylesheet = YamlAdocStylesheet(
             Paths.get("./fonts").toAbsolutePath(),
-            yamlStylesheet
+            yamlStylesheet,
+            fontsCache
         )
 
         if (Files.exists(file)) {
@@ -93,7 +96,7 @@ class AdocPdfTest {
         parsingTimes.add(parsingTime)
         printingTimes.add(printingMillis)
 
-        printStats(totalTime, parsingTime, printingMillis)
+        printStats(totalTime, parsingTime, printingMillis, fontsCache = fontsCache)
     }
 
 }
@@ -103,7 +106,13 @@ fun findPercentile(sorted: List<Long>, percentile: Double): Long {
     return sorted[index]
 }
 
-private fun printStats(totalTime: Long, parsingTime: Long, printingMillis: Long, stat: String = TOTAL) {
+private fun printStats(
+    totalTime: Long,
+    parsingTime: Long,
+    printingMillis: Long,
+    stat: String = TOTAL,
+    fontsCache: HashmapFontsCache? = null
+) {
     val sb = StringBuilder()
         .append(stat.padEnd(6))
         .append(totalTime.toString().padStart(5))
@@ -114,6 +123,15 @@ private fun printStats(totalTime: Long, parsingTime: Long, printingMillis: Long,
         .append(PRINTING)
         .append(printingMillis.toString().padStart(5))
         .append(" ms")
+
+    if (fontsCache != null) {
+        sb.append(" | ")
+            .append("Fonts cache hits: ")
+            .append(fontsCache.hits())
+            .append(" | ")
+            .append("Fonts cache misses: ")
+            .append(fontsCache.misses())
+    }
 
     println(sb)
 }
