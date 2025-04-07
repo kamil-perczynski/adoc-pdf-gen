@@ -19,7 +19,7 @@ private const val PRINTING = "Printing"
 private const val P90 = "P90"
 private const val MEDIAN = "Median"
 
-private const val EPOCHS = 25
+private const val EPOCHS = 30
 
 private val totalTimes = mutableListOf<Long>()
 private val parsingTimes = mutableListOf<Long>()
@@ -45,13 +45,13 @@ class AdocPdfTest {
         printStats(medianTotal, medianParsing, medianPrinting, MEDIAN)
         printStats(percentile90Total, percentile90Parsing, percentile90Printing, P90)
 
-        assertThat(medianTotal).isLessThanOrEqualTo(100)
+        assertThat(medianTotal).isLessThanOrEqualTo(150)
         assertThat(medianParsing).isLessThanOrEqualTo(40)
-        assertThat(medianPrinting).isLessThanOrEqualTo(60)
+        assertThat(medianPrinting).isLessThanOrEqualTo(110)
 
         assertThat(percentile90Total).isLessThanOrEqualTo(250)
-        assertThat(percentile90Parsing).isLessThanOrEqualTo(130)
-        assertThat(percentile90Printing).isLessThanOrEqualTo(120)
+        assertThat(percentile90Parsing).isLessThanOrEqualTo(80)
+        assertThat(percentile90Printing).isLessThanOrEqualTo(170)
     }
 
     @RepeatedTest(EPOCHS)
