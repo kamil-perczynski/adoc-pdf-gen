@@ -1,16 +1,22 @@
 package io.github.kamilperczynski.adocparser.stylesheet.yaml
 
-import com.lowagie.text.*
+import com.lowagie.text.Chunk
+import com.lowagie.text.ListItem
+import com.lowagie.text.Paragraph
 import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
+import io.github.kamilperczynski.adocparser.stylesheet.FontsCache
 import io.github.kamilperczynski.adocparser.stylesheet.PdfList
+import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlFontStyle.*
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlTextAlign.*
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.LazyThreadSafetyMode.NONE
 
 class YamlAdocStylesheet(
     private val fontsDir: Path = Paths.get("."),
-    private val yamlStylesheet: YamlStylesheet
+    private val yamlStylesheet: YamlStylesheet,
+    private val fontsCache: FontsCache
 ) : AdocStylesheet {
 
     private val baseFontProps = FONT_FALLBACK.merge(yamlStylesheet.base)
@@ -20,12 +26,13 @@ class YamlAdocStylesheet(
             val fontFamily = entry.key
             val fonts = entry.value
 
-            registerFont(fonts, fontFamily)
+            registerFontFamily(fontFamily, fonts)
         }
     }
 
-    override val baseFont: Font
-        get() = toFont(baseFontProps)
+    override val baseFont by lazy(NONE) {
+        toFont(fontProps = baseFontProps, fontsCache = fontsCache)
+    }
 
     override fun styleParagraph(paragraph: Paragraph, adocParagraph: AdocParagraph) {
         applyParagraphStyles(
@@ -52,8 +59,7 @@ class YamlAdocStylesheet(
         paragraphFont: YamlFontProps,
         paragraphProps: YamlParagraphProps
     ) {
-
-        pdfParagraph.font = toFont(paragraphFont, baseFont.size)
+        pdfParagraph.font = toFont(paragraphFont, baseFont.size, fontsCache)
         pdfParagraph.leading = paragraphProps.lineHeight?.let { parseUnit(it, baseFont.size) }!!
         pdfParagraph.spacingBefore = paragraphProps.spacingBefore?.let { parseUnit(it, baseFont.size) }!!
         pdfParagraph.spacingAfter = paragraphProps.spacingAfter?.let { parseUnit(it, baseFont.size) }!!
@@ -97,6 +103,7 @@ class YamlAdocStylesheet(
         applyParagraphStyles(
             listItem,
             FONT_FALLBACK
+                .merge(yamlStylesheet.base)
                 .merge(yamlStylesheet.paragraph.font)
                 .merge(yamlStylesheet.list.defaults.paragraph.font)
                 .merge(paragraphProps.font),
@@ -120,6 +127,7 @@ class YamlAdocStylesheet(
             )
 
         val fontProps = FONT_FALLBACK
+            .merge(yamlStylesheet.base)
             .merge(yamlStylesheet.paragraph.font)
             .merge(yamlStylesheet.list.defaults.paragraph.font)
             .merge(listProps.paragraph.font)
@@ -129,15 +137,13 @@ class YamlAdocStylesheet(
         pdfList.isLowercase = listProps.lowercased ?: firstItem.lowercased
         pdfList.isNumbered = listProps.numbered ?: firstItem.numbered
 
-        pdfList.setListSymbol(Chunk(listProps.listSymbol, toFont(fontProps)))
+        pdfList.setListSymbol(Chunk(listProps.listSymbol, toFont(fontProps, fontsCache = fontsCache)))
 
-        pdfList.indentationLeft =
-            listProps.indentationLeft?.let { parseUnit(it, baseFont.size) }
-                ?: pdfList.indentationLeft
+        pdfList.indentationLeft = listProps.indentationLeft?.let { parseUnit(it, baseFont.size) }
+            ?: pdfList.indentationLeft
 
-        pdfList.indentationRight =
-            listProps.indentationRight?.let { parseUnit(it, baseFont.size) }
-                ?: pdfList.indentationRight
+        pdfList.indentationRight = listProps.indentationRight?.let { parseUnit(it, baseFont.size) }
+            ?: pdfList.indentationRight
 
         pdfList.symbolIndent = listProps.symbolIndent?.let { parseUnit(it, baseFont.size) }
             ?: pdfList.symbolIndent
@@ -155,34 +161,31 @@ class YamlAdocStylesheet(
         )
     }
 
-    private fun registerFont(fonts: YamlFontCatalogItem, fontFamily: String) {
-        fonts.bold?.let {
-            FontFactory.register(
-                fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "${fontFamily.lowercase()}-bold",
-            )
+    private fun registerFontFamily(fontFamily: String, fonts: YamlFontCatalogItem) {
+        fonts.bold?.let { fontFile ->
+            registerFontFamily(fontFamily, bold, fontFile)
         }
-        fonts.italic?.let {
-            FontFactory.register(
-                fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "${fontFamily.lowercase()}-italic",
-            )
+        fonts.italic?.let { fontFile ->
+            registerFontFamily(fontFamily, italic, fontFile)
         }
-        fonts.boldItalic?.let {
-            FontFactory.register(
-                fontsDir.resolve(fontFamily).resolve(it).toString(),
-                "${fontFamily.lowercase()}-bolditalic",
-            )
+        fonts.boldItalic?.let { fontFile ->
+            registerFontFamily(fontFamily, boldItalic, fontFile)
         }
-        fonts.normal?.let {
-            FontFactory.register(
-                fontsDir.resolve(fontFamily).resolve(it).toString(),
-                fontFamily,
-            )
+        fonts.normal?.let { fontFile ->
+            registerFontFamily(fontFamily, normal, fontFile)
         }
     }
-}
 
+    private fun registerFontFamily(fontFamily: String, fontStyle: YamlFontStyle, fontFile: String) {
+        val fontName = if (fontStyle == normal)
+            fontFamily.lowercase()
+        else
+            "${fontFamily.lowercase()}-${fontStyle.value}"
+
+        val fontPath = fontsDir.resolve(fontFamily).resolve(fontFile)
+        fontsCache.registerFont(fontName, fontPath.toString())
+    }
+}
 
 private fun toHeaderProps(headerLevel: Int, headingProps: YamlHeadingProperties): YamlParagraphProps? {
     return when (headerLevel) {

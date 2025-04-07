@@ -27,7 +27,6 @@ paragraph:
 heading:
   defaults:
     font:
-      fontFamily: ubuntu
       fontStyle: bold
       textDecoration: none
     lineHeight: 1.5rem

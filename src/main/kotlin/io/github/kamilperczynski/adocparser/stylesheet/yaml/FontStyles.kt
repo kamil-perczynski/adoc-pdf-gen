@@ -3,6 +3,7 @@ package io.github.kamilperczynski.adocparser.stylesheet.yaml
 import com.lowagie.text.Font
 import com.lowagie.text.FontFactory
 import com.lowagie.text.pdf.BaseFont
+import io.github.kamilperczynski.adocparser.stylesheet.FontsCache
 
 internal const val DEFAULT_BASE_FONT_SIZE = 12f
 
@@ -23,7 +24,9 @@ internal val PARAGRAPH_FALLBACK = YamlParagraphProps(
     lineHeight = "1.25rem"
 )
 
-internal fun toFont(fontProps: YamlFontProps, baseFontSize: Float = DEFAULT_BASE_FONT_SIZE): Font {
+internal fun toFont(fontProps: YamlFontProps,
+                    baseFontSize: Float = DEFAULT_BASE_FONT_SIZE,
+                    fontsCache: FontsCache): Font {
     val familyIndex = Font.getFamilyIndex(fontProps.fontFamily ?: FontFactory.TIMES_ROMAN)
 
     if (familyIndex != Font.UNDEFINED) {
@@ -46,6 +49,16 @@ internal fun toFont(fontProps: YamlFontProps, baseFontSize: Float = DEFAULT_BASE
         Font.NORMAL
     else
         toFontStyle(fontProps) ?: Font.NORMAL
+
+    val cachedBaseFont = fontsCache.getFont(fontName)
+    if (cachedBaseFont != null) {
+        return Font(
+            cachedBaseFont,
+            parseUnit(fontProps.fontSize, baseFontSize) ?: baseFontSize,
+            fontStyle,
+            toColor(fontProps.fontColor)
+        )
+    }
 
     return FontFactory.getFont(
         fontName,
