@@ -11,8 +11,14 @@ font:
       bold: static/Ubuntu-Medium.ttf
       italic: static/Ubuntu-Italic.ttf
       boldItalic: static/Ubuntu-MediumItalic.ttf
+    Inter:
+      normal: static/Inter_24pt-Regular.ttf
+      bold: static/Inter_24pt-Bold.ttf
+      italic: static/Inter_24pt-Italic.ttf
+      boldItalic: static/Inter_24pt-BoldItalic.ttf
 base:
-  fontSize: 12
+  fontSize: 10
+  fontFamily: inter
 paragraph:
   lineHeight: 1.25rem
   spacingBefore: .625rem
