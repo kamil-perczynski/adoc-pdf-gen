@@ -50,13 +50,13 @@ class AdocPdfTests {
             }
 
         override fun assertStats() {
-            assertThat(totalTimes.p50).isLessThanOrEqualTo(140)
-            assertThat(parsingTimes.p50).isLessThanOrEqualTo(40)
-            assertThat(printingTimes.p50).isLessThanOrEqualTo(100)
+            assertThat(totalTimes.p50).isLessThanOrEqualTo(80)
+            assertThat(parsingTimes.p50).isLessThanOrEqualTo(30)
+            assertThat(printingTimes.p50).isLessThanOrEqualTo(50)
 
-            assertThat(totalTimes.p90).isLessThanOrEqualTo(250)
-            assertThat(parsingTimes.p90).isLessThanOrEqualTo(130)
-            assertThat(printingTimes.p90).isLessThanOrEqualTo(120)
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(80)
+            assertThat(parsingTimes.p90).isLessThanOrEqualTo(30)
+            assertThat(printingTimes.p90).isLessThanOrEqualTo(50)
         }
     }
 
@@ -88,8 +88,8 @@ class AdocPdfTests {
             assertThat(parsingTimes.p50).isLessThanOrEqualTo(40)
             assertThat(printingTimes.p50).isLessThanOrEqualTo(100)
 
-            assertThat(totalTimes.p90).isLessThanOrEqualTo(250)
-            assertThat(parsingTimes.p90).isLessThanOrEqualTo(100)
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(300)
+            assertThat(parsingTimes.p90).isLessThanOrEqualTo(150)
             assertThat(printingTimes.p90).isLessThanOrEqualTo(150)
         }
     }

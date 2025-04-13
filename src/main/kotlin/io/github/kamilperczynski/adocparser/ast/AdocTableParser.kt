@@ -3,7 +3,7 @@ package io.github.kamilperczynski.adocparser.ast
 import io.github.kamilperczynski.adocparser.AsciidocParser.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class AdocTableParser(private val ast: AdocAST) {
+class AdocTableParser(private val ast: AdocAST, private val currentSection: AdocSection) {
 
     private var inferredColsCount: Int = 0
 
@@ -25,7 +25,9 @@ class AdocTableParser(private val ast: AdocAST) {
 
         }
 
-        ast.push(AdocTable(inferredColsCount, cols))
+        ast.push(
+            currentSection.copy(content = AdocTable(inferredColsCount, cols))
+        )
     }
 
     private fun parseColumn(col: Table_cellContext, cols: MutableList<AdocTableCol>) {

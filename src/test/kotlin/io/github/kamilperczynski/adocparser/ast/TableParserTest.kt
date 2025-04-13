@@ -32,8 +32,19 @@ class TableParserTest {
         val ast = parser.parseAdocAst()
 
         // then
-        assertThat(ast.nodes).containsExactly(
-            AdocSectionTitle(listOf(AdocChunk(TEXT, "Countries in Europe "))),
+        val astNode = ast.nodes.first()
+        assertThat(astNode).isInstanceOf(AdocSection::class.java)
+
+        val adocSection = astNode as AdocSection
+        assertThat(adocSection.params).containsExactly(
+            "[#table_countries,reftext='{table-caption} {counter:table-num}']",
+            "[cols=\"50e,^25m,>25s\",width=\"75%\",options=\"header\",align=\"center\"]"
+        )
+
+        assertThat(adocSection.sectionTitle)
+            .isEqualTo(AdocSectionTitle(listOf(AdocChunk(TEXT, "Countries in Europe "))))
+
+        assertThat(adocSection.content).isEqualTo(
             AdocTable(
                 colsCount = 3,
                 cols = listOf(
@@ -74,8 +85,18 @@ class TableParserTest {
         val ast = parser.parseAdocAst()
 
         // then
-        assertThat(ast.nodes).containsExactly(
-            AdocSectionTitle(listOf(AdocChunk(TEXT, "Countries in Europe "))),
+        val astNode = ast.nodes.first()
+        assertThat(astNode).isInstanceOf(AdocSection::class.java)
+
+        val adocSection = astNode as AdocSection
+        assertThat(adocSection.params).containsExactly(
+            "[#table_countries,reftext='{table-caption} {counter:table-num}']",
+            "[cols=\"50e,^25m,>25s\",width=\"75%\",options=\"header\",align=\"center\"]"
+        )
+
+        assertThat(adocSection.sectionTitle)
+            .isEqualTo(AdocSectionTitle(listOf(AdocChunk(TEXT, "Countries in Europe "))))
+        assertThat(adocSection.content).isEqualTo(
             AdocTable(
                 colsCount = 3,
                 cols = listOf(
@@ -98,7 +119,6 @@ class TableParserTest {
         // given
         val parser = AdocParser(
             """
-                [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
                 |===
                 | Country | Population | Size
                 
@@ -115,10 +135,15 @@ class TableParserTest {
         val ast = parser.parseAdocAst()
 
         // then
-        assertThat(ast.nodes).satisfiesExactly({ it is AdocTable })
+        assertThat(ast.nodes).satisfiesExactly({ it is AdocSection })
 
-        val table = ast.nodes.first() as AdocTable
+        val adocSection = ast.nodes.first() as AdocSection
 
+        assertThat(adocSection.params).isEmpty()
+        assertThat(adocSection.sectionTitle).isNull()
+        assertThat(adocSection.content).isInstanceOf(AdocTable::class.java)
+
+        val table = adocSection.content as AdocTable
         assertThat(table.cols).containsExactly(
             AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "Population"))),
