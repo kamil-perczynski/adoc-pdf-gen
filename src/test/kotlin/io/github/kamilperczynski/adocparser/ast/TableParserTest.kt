@@ -3,6 +3,7 @@ package io.github.kamilperczynski.adocparser.ast
 import io.github.kamilperczynski.adocparser.AdocParser
 import io.github.kamilperczynski.adocparser.ast.ChunkType.TEXT
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.entry
 import org.junit.jupiter.api.Test
 
 class TableParserTest {
@@ -12,9 +13,8 @@ class TableParserTest {
         // given
         val parser = AdocParser(
             """
-                [#table_countries,reftext='{table-caption} {counter:table-num}']
                 .Countries in Europe
-                [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
+                [#table_countries, cols="50e,^25m,>25s",width="75%",options="header",align="center", FooBar]
                 |===
                 | Country | Population | Size
                 | Monaco
@@ -36,9 +36,15 @@ class TableParserTest {
         assertThat(astNode).isInstanceOf(AdocSection::class.java)
 
         val adocSection = astNode as AdocSection
-        assertThat(adocSection.params).containsExactly(
-            "[#table_countries,reftext='{table-caption} {counter:table-num}']",
-            "[cols=\"50e,^25m,>25s\",width=\"75%\",options=\"header\",align=\"center\"]"
+        assertThat(adocSection.params.namedParams).containsExactly(
+            entry("cols", "50e,^25m,>25s"),
+            entry("width", "75%"),
+            entry("options", "header"),
+            entry("align", "center"),
+        )
+        assertThat(adocSection.params.positionalParams).containsExactly(
+            entry(0, "#table_countries"),
+            entry(5, "FooBar")
         )
 
         assertThat(adocSection.sectionTitle)
@@ -89,9 +95,16 @@ class TableParserTest {
         assertThat(astNode).isInstanceOf(AdocSection::class.java)
 
         val adocSection = astNode as AdocSection
-        assertThat(adocSection.params).containsExactly(
-            "[#table_countries,reftext='{table-caption} {counter:table-num}']",
-            "[cols=\"50e,^25m,>25s\",width=\"75%\",options=\"header\",align=\"center\"]"
+        assertThat(adocSection.params).isEqualTo(
+            AdocParams(
+                mapOf(),
+                mapOf(
+                    "cols" to "50e,^25m,>25s",
+                    "width" to "75%",
+                    "options" to "header",
+                    "align" to "center"
+                )
+            )
         )
 
         assertThat(adocSection.sectionTitle)
@@ -139,7 +152,7 @@ class TableParserTest {
 
         val adocSection = ast.nodes.first() as AdocSection
 
-        assertThat(adocSection.params).isEmpty()
+        assertThat(adocSection.params.isEmpty()).isTrue()
         assertThat(adocSection.sectionTitle).isNull()
         assertThat(adocSection.content).isInstanceOf(AdocTable::class.java)
 

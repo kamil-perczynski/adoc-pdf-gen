@@ -85,11 +85,14 @@ class AdocParser(adoc: String) {
 }
 
 private fun toAdocSection(child: AsciidocParser.SectionContext): AdocSection {
-    val params = child.param_line().map { it.params().text }
+    val params = child.param_line().lastOrNull()
+        ?.let { AdocParamsParser(it).parse() }
+        ?: EMPTY_ADOC_PARAMS
+
     val id = child.id_line()?.id()?.WORD()?.text
     val sectionTitle = toSectionTitle(child)
 
-    return AdocSection(id, params, sectionTitle, null)
+    return AdocSection(id, sectionTitle, null, params)
 }
 
 private fun toAdmonitionSectionType(child: AsciidocParser.SectionContext): AdmonitionType? {
