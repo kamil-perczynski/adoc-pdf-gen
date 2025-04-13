@@ -14,6 +14,13 @@ class AdocAST {
 
 interface AdocNode
 
+data class AdocSection(
+    val id: String?,
+    val params: List<String>,
+    val sectionTitle: AdocSectionTitle?,
+    val content: AdocNode?
+) : AdocNode
+
 data class AdocHeader(
     val level: Int,
     val chunks: List<AdocChunk>,
@@ -41,7 +48,7 @@ data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode
 data class AdocAdmonition(val admonitionType: AdmonitionType, val paragraph: AdocParagraph) : AdocNode
 
-class AdocPageBreak: AdocNode {
+class AdocPageBreak : AdocNode {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is AdocPageBreak) return false

@@ -36,21 +36,35 @@ class AdocPdf(stylesheet: AdocStylesheet) {
         document.open()
 
         for (node in ast.nodes) {
-            when (node) {
-                is AdocParagraph -> pdfParagraphPrinter.printParagraph(node)
-                is AdocSectionTitle -> pdfParagraphPrinter.printSectionTitle(node)
-                is AdocHeader -> headerPrinter.printHeader(node, writer)
-                is AdocBlock -> blockPrinter.printBlock(node)
-                is AdocList -> listPrinter.printList(node)
-                is AdocTable -> tablePrinter.printTable(node)
-                is AdocAdmonition -> admonitionPrinter.printAdmonition(node)
-                is AdocPageBreak -> {
-                    document.newPage()
-                }
-            }
+            printNode(node, writer)
         }
 
         document.close()
+    }
+
+    private fun printNode(node: AdocNode, writer: PdfWriter) {
+        when (node) {
+            is AdocParagraph -> pdfParagraphPrinter.printParagraph(node)
+            is AdocSectionTitle -> pdfParagraphPrinter.printSectionTitle(node)
+            is AdocHeader -> headerPrinter.printHeader(node, writer)
+            is AdocBlock -> blockPrinter.printBlock(node)
+            is AdocList -> listPrinter.printList(node)
+            is AdocTable -> tablePrinter.printTable(node)
+            is AdocAdmonition -> admonitionPrinter.printAdmonition(node)
+            is AdocSection -> {
+                if (node.sectionTitle != null) {
+                    pdfParagraphPrinter.printSectionTitle(node.sectionTitle)
+                }
+
+                if (node.content != null) {
+                    printNode(node.content, writer)
+                }
+            }
+
+            is AdocPageBreak -> {
+                document.newPage()
+            }
+        }
     }
 
 }

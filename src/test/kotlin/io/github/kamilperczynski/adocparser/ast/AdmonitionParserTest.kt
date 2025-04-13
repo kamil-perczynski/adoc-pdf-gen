@@ -29,8 +29,13 @@ class AdmonitionParserTest {
         val ast = parser.parseAdocAst()
 
         // then
-        assertThat(ast.nodes).containsExactly(
-            AdocSectionTitle(listOf(AdocChunk(TEXT, "Instructions "))),
+        assertThat(ast.nodes).satisfiesExactly(
+            { assertThat(it).isInstanceOf(AdocSection::class.java) }
+        )
+
+        val section = ast.nodes.first() as AdocSection
+        assertThat(section.sectionTitle).isEqualTo(AdocSectionTitle(listOf(AdocChunk(TEXT, "Instructions "))))
+        assertThat(section.content).isEqualTo(
             AdocAdmonition(
                 NOTE,
                 AdocParagraph(
@@ -61,9 +66,17 @@ class AdmonitionParserTest {
         val ast = parser.parseAdocAst()
 
         // then
-        assertThat(ast.nodes).containsExactly(
-            AdocHeader(1, listOf(AdocChunk(TEXT, "Foo Bar ")), emptyList()),
-            AdocSectionTitle(listOf(AdocChunk(TEXT, "Instructions "))),
+        assertThat(ast.nodes).satisfiesExactly(
+            { assertThat(it).isInstanceOf(AdocSection::class.java) },
+            { assertThat(it).isInstanceOf(AdocSection::class.java) }
+        )
+
+        val section1 = ast.nodes[0] as AdocSection
+        assertThat(section1.content).isEqualTo(AdocHeader(1, listOf(AdocChunk(TEXT, "Foo Bar ")), emptyList()))
+
+        val section2 = ast.nodes[1] as AdocSection
+        assertThat(section2.sectionTitle).isEqualTo(AdocSectionTitle(listOf(AdocChunk(TEXT, "Instructions "))))
+        assertThat(section2.content).isEqualTo(
             AdocAdmonition(
                 IMPORTANT,
                 AdocParagraph(listOf(AdocChunk(TEXT, "This is important. ")))

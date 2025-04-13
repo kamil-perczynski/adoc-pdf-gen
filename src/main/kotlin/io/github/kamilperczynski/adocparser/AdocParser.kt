@@ -14,40 +14,36 @@ class AdocParser(adoc: String) {
         val ast = AdocAST()
 
         for (child in parser.doc().section()) {
-            val admonitionSectionType =
-                if (child.ADMONITION_LINE().isNotEmpty())
-                    toAdmonitionType(child.ADMONITION_LINE().first().text.trim())
-                else null
-
-            if (child.section_title().isNotEmpty()) {
-                val chunks = AdocTextChunker()
-                    .parseLine { child.section_title().last().children.drop(1) }
-                    .chunks
-
-                ast.push(AdocSectionTitle(chunks))
-            }
+            val currentSection = toAdocSection(child)
+            val admonitionSectionType = toAdmonitionSectionType(child)
 
             if (child.admonition() != null) {
                 val admonition = child.admonition()
                 val paragraph = toAdocParagraph(admonition.paragraph_line())
                 val admonitionType = toAdmonitionTypeInlineToken(admonition.ADMONITION_INLINE().text.trim())
 
-                ast.push(AdocAdmonition(admonitionType, paragraph))
+                ast.push(
+                    currentSection.copy(content = AdocAdmonition(admonitionType, paragraph))
+                )
             } else if (child.paragraph_line().isNotEmpty()) {
                 val paragraph = toAdocParagraph(child.paragraph_line())
 
                 if (admonitionSectionType != null) {
-                    ast.push(AdocAdmonition(admonitionSectionType, paragraph))
+                    ast.push(
+                        currentSection.copy(content = AdocAdmonition(admonitionSectionType, paragraph))
+                    )
                 } else {
+                    currentSection.sectionTitle?.let { ast.push(it) }
                     ast.push(paragraph)
                 }
             } else if (child.header() != null) {
-                AdocHeaderParser(ast).parse(child.header())
+                AdocHeaderParser(ast, currentSection).parse(child.header())
             } else if (child.table() != null) {
                 val table = child.table()
-                AdocTableParser(ast).parse(table)
+
+                AdocTableParser(ast, currentSection).parse(table)
             } else if (child.block() != null) {
-                val blockParser = AdocBlockParser(ast)
+                val blockParser = AdocBlockParser(ast, currentSection)
 
                 if (admonitionSectionType == null) {
                     blockParser.parse(child.block())
@@ -78,8 +74,7 @@ class AdocParser(adoc: String) {
                 }
 
                 ast.push(AdocList(listItems))
-            }
-            else if (child.page_break() != null) {
+            } else if (child.page_break() != null) {
                 ast.push(AdocPageBreak())
             }
         }
@@ -87,6 +82,34 @@ class AdocParser(adoc: String) {
         return ast
     }
 
+}
+
+private fun toAdocSection(child: AsciidocParser.SectionContext): AdocSection {
+    val params = child.param_line().map { it.params().text }
+    val id = child.id_line()?.id()?.WORD()?.text
+    val sectionTitle = toSectionTitle(child)
+
+    return AdocSection(id, params, sectionTitle, null)
+}
+
+private fun toAdmonitionSectionType(child: AsciidocParser.SectionContext): AdmonitionType? {
+    if (child.ADMONITION_LINE().isEmpty()) {
+        return null
+    }
+
+    return toAdmonitionType(child.ADMONITION_LINE().first().text.trim())
+}
+
+private fun toSectionTitle(child: AsciidocParser.SectionContext): AdocSectionTitle? {
+    if (child.section_title().isEmpty()) {
+        return null
+    }
+
+    return AdocSectionTitle(
+        AdocTextChunker()
+            .parseLine { child.section_title().last().children.drop(1) }
+            .chunks
+    )
 }
 
 private fun isNumberedList(listTypeToken: TerminalNode) =

@@ -4,7 +4,7 @@ import io.github.kamilperczynski.adocparser.AsciidocParser
 import io.github.kamilperczynski.adocparser.createAdocAntlrParser
 import io.github.kamilperczynski.adocparser.toAdocParagraph
 
-class AdocBlockParser(private val ast: AdocAST) {
+class AdocBlockParser(private val ast: AdocAST, private val currentSection: AdocSection) {
 
     fun parse(block: AsciidocParser.BlockContext) {
         val chunks = block.BLOCK_CONTENT()
@@ -21,7 +21,9 @@ class AdocBlockParser(private val ast: AdocAST) {
         val section = createAdocAntlrParser(blockContent).section()
         val adocParagraph = toAdocParagraph(section.paragraph_line())
 
-        ast.push(AdocAdmonition(admonitionType, adocParagraph))
+        ast.push(
+            currentSection.copy(content = AdocAdmonition(admonitionType, adocParagraph))
+        )
     }
 
 }

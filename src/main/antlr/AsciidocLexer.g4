@@ -43,7 +43,11 @@ EOL : '\r'? '\n';
 INTER: ~[a-zA-Z0-9_\\ \r\n:[*]+;
 
 mode M_PARAM;
-PARAM_CONTENT : ~[\r\t\n\]]+;
+M_PARAM_COMMA: ',';
+M_PARAM_QUOTE: ["'];
+M_PARAM_EQ: '=';
+M_PARAM_NAME: [#\p{L}\p{N}_] [\p{L}\p{N}_]*;
+M_PARAM_VALUE : ~[\p{L}\p{N}_,"'\n\]=]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;
@@ -56,8 +60,8 @@ TABLE_CELL_START: '|';
 T_WS : [ \t]+;
 T_EOL : '\r'? '\n';
 TABLE_END : '|===' '\r'? '\n' -> popMode;
-T_INTER: ~[a-zA-Z0-9 \r\n^><|]+;
-T_WORD : [a-zA-Z0-9]+;
+T_INTER: ~[\p{L}\p{N} \r\n^><|]+;
+T_WORD : [\p{L}\p{N}]+;
 
 mode M_BLOCK;
 // {blockParsing.blockEnd(BLOCK_START, _input, getText())}?
