@@ -7,10 +7,9 @@ import io.github.kamilperczynski.adocparser.stylesheet.HashmapFontsCache
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.YamlAdocStylesheet
 import io.github.kamilperczynski.adocparser.stylesheet.yaml.parseYamlStylesheet
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.RepeatedTest
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.system.measureTimeMillis
 
@@ -22,73 +21,114 @@ private const val MEDIAN = "Median"
 
 private const val EPOCHS = 30
 
-private val totalTimes = mutableListOf<Long>()
-private val parsingTimes = mutableListOf<Long>()
-private val printingTimes = mutableListOf<Long>()
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AdocPdfTests {
 
-class AdocPdfTest {
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class RomanTypographyTest : AdocPdfTest() {
+
+        override val sourceAdocContent: String
+            get() = AdocPdfTest::class.java.classLoader
+                .getResourceAsStream("./doc2.adoc")?.let { String(it.readAllBytes()) }
+                ?: throw IllegalStateException("Cannot read file")
+
+        override val targetPdfFile: Path
+            get() = Paths.get("./AdocPdf-Test-Roman.pdf")
+
+        override val stylesheet: AdocStylesheet
+            get() {
+                val yamlStylesheet =
+                    parseYamlStylesheet(this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!)
+
+                yamlStylesheet.base?.fontFamily = "times"
+
+                val stylesheet: AdocStylesheet =
+                    YamlAdocStylesheet(Paths.get("./fonts").toAbsolutePath(), yamlStylesheet, HashmapFontsCache())
+
+                return stylesheet
+            }
+
+        override fun assertStats() {
+            assertThat(totalTimes.p50).isLessThanOrEqualTo(140)
+            assertThat(parsingTimes.p50).isLessThanOrEqualTo(40)
+            assertThat(printingTimes.p50).isLessThanOrEqualTo(100)
+
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(250)
+            assertThat(parsingTimes.p90).isLessThanOrEqualTo(130)
+            assertThat(printingTimes.p90).isLessThanOrEqualTo(120)
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class InterTypographyTest : AdocPdfTest() {
+
+        override val sourceAdocContent: String
+            get() = AdocPdfTest::class.java.classLoader
+                .getResourceAsStream("./doc2.adoc")?.let { String(it.readAllBytes()) }
+                ?: throw IllegalStateException("Cannot read file")
+
+        override val targetPdfFile: Path
+            get() = Paths.get("./AdocPdf-Test-Inter.pdf")
+
+        override val stylesheet: AdocStylesheet
+            get() {
+                val yamlStylesheet =
+                    parseYamlStylesheet(this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!)
+
+                val stylesheet: AdocStylesheet =
+                    YamlAdocStylesheet(Paths.get("./fonts").toAbsolutePath(), yamlStylesheet, HashmapFontsCache())
+
+                return stylesheet
+            }
+
+        override fun assertStats() {
+            assertThat(totalTimes.p50).isLessThanOrEqualTo(140)
+            assertThat(parsingTimes.p50).isLessThanOrEqualTo(40)
+            assertThat(printingTimes.p50).isLessThanOrEqualTo(100)
+
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(250)
+            assertThat(parsingTimes.p90).isLessThanOrEqualTo(100)
+            assertThat(printingTimes.p90).isLessThanOrEqualTo(150)
+        }
+    }
+
+}
+
+
+abstract class AdocPdfTest {
+
+    internal val totalTimes = Stat()
+    internal val parsingTimes = Stat()
+    internal val printingTimes = Stat()
 
     @Test
     fun testMedianAndPercentiles() {
-        val sortedTotalTimes = totalTimes.sorted()
-        val sortedParsingTimes = parsingTimes.sorted()
-        val sortedPrintingTimes = printingTimes.sorted()
-
-        val medianTotal = findPercentile(sortedTotalTimes, 0.5)
-        val medianParsing = findPercentile(sortedParsingTimes, 0.5)
-        val medianPrinting = findPercentile(sortedPrintingTimes, 0.5)
-
-        val percentile90Total = findPercentile(sortedTotalTimes, 0.9)
-        val percentile90Parsing = findPercentile(sortedParsingTimes, 0.9)
-        val percentile90Printing = findPercentile(sortedPrintingTimes, 0.9)
-
         println("-----------------------------------------------------------------")
-        printStats(medianTotal, medianParsing, medianPrinting, MEDIAN)
-        printStats(percentile90Total, percentile90Parsing, percentile90Printing, P90)
+        printStats(totalTimes.p50, parsingTimes.p50, printingTimes.p50, MEDIAN)
+        printStats(totalTimes.p90, parsingTimes.p90, printingTimes.p90, P90)
 
-        assertThat(medianTotal).isLessThanOrEqualTo(150)
-        assertThat(medianParsing).isLessThanOrEqualTo(40)
-        assertThat(medianPrinting).isLessThanOrEqualTo(110)
-
-        assertThat(percentile90Total).isLessThanOrEqualTo(250)
-        assertThat(percentile90Parsing).isLessThanOrEqualTo(80)
-        assertThat(percentile90Printing).isLessThanOrEqualTo(170)
+        assertStats()
     }
 
     @RepeatedTest(EPOCHS)
     @Order(1)
     fun testPrintPdf() {
-        val file = Paths.get("./LibraryTest-test.pdf")
-
-        val yamlStylesheet = parseYamlStylesheet(
-            this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!
-        )
-
-        val fontsCache = HashmapFontsCache()
-        val stylesheet: AdocStylesheet = YamlAdocStylesheet(
-            Paths.get("./fonts").toAbsolutePath(),
-            yamlStylesheet,
-            fontsCache
-        )
-
-        if (Files.exists(file)) {
-            Files.delete(file)
+        if (Files.exists(targetPdfFile)) {
+            Files.delete(targetPdfFile)
         }
-
-        val adoc = AdocPdfTest::class.java.classLoader
-            .getResourceAsStream("./doc2.adoc")?.let { String(it.readAllBytes()) }
-            ?: throw IllegalStateException("Cannot read file")
 
         val ast: AdocAST
 
         val parsingTime = measureTimeMillis {
-            ast = AdocParser(adoc).parseAdocAst()
+            ast = AdocParser(sourceAdocContent).parseAdocAst()
         }
 
         stylesheet.registerFonts()
 
         val printingMillis = measureTimeMillis {
-            AdocPdf(stylesheet).print(ast, Files.newOutputStream(file))
+            AdocPdf(stylesheet).print(ast, Files.newOutputStream(targetPdfFile))
         }
 
         val totalTime = parsingTime + printingMillis
@@ -96,23 +136,18 @@ class AdocPdfTest {
         parsingTimes.add(parsingTime)
         printingTimes.add(printingMillis)
 
-        printStats(totalTime, parsingTime, printingMillis, fontsCache = fontsCache)
+        printStats(totalTime, parsingTime, printingMillis)
     }
 
+    abstract val sourceAdocContent: String
+    abstract val targetPdfFile: Path
+    abstract val stylesheet: AdocStylesheet
+
+    abstract fun assertStats()
 }
 
-fun findPercentile(sorted: List<Long>, percentile: Double): Long {
-    val index = (percentile * sorted.size).toInt()
-    return sorted[index]
-}
 
-private fun printStats(
-    totalTime: Long,
-    parsingTime: Long,
-    printingMillis: Long,
-    stat: String = TOTAL,
-    fontsCache: HashmapFontsCache? = null
-) {
+private fun printStats(totalTime: Long, parsingTime: Long, printingMillis: Long, stat: String = TOTAL) {
     val sb = StringBuilder()
         .append(stat.padEnd(6))
         .append(totalTime.toString().padStart(5))
@@ -124,14 +159,27 @@ private fun printStats(
         .append(printingMillis.toString().padStart(5))
         .append(" ms")
 
-    if (fontsCache != null) {
-        sb.append(" | ")
-            .append("Fonts cache hits: ")
-            .append(fontsCache.hits())
-            .append(" | ")
-            .append("Fonts cache misses: ")
-            .append(fontsCache.misses())
+    println(sb)
+}
+
+class Stat {
+
+    private val data: MutableList<Long> = mutableListOf()
+
+    fun add(value: Long) {
+        data.add(value)
     }
 
-    println(sb)
+    val p50: Long
+        get() = percentile(0.5)
+
+    val p90: Long
+        get() = percentile(0.9)
+
+    fun percentile(percentile: Double): Long {
+        val sorted = data.sorted()
+        val index = (percentile * sorted.size).toInt()
+        return sorted[index]
+    }
+
 }

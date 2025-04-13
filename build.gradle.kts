@@ -14,6 +14,7 @@ dependencies {
     implementation("com.github.librepdf:openpdf:2.0.3")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     antlr("org.antlr:antlr4:4.9.3")
 
