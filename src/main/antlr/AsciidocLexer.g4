@@ -47,7 +47,8 @@ M_PARAM_COMMA: ',';
 M_PARAM_QUOTE: ["'];
 M_PARAM_EQ: '=';
 M_PARAM_NAME: [#\p{L}\p{N}_] [\p{L}\p{N}_]*;
-M_PARAM_VALUE : ~[\p{L}\p{N}_,"'\n\]=]+;
+M_PARAM_WS : [ \t]+;
+M_PARAM_VALUE : ~[\r\n ,"'\][=]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;

@@ -16,9 +16,9 @@ interface AdocNode
 
 data class AdocSection(
     val id: String?,
-    val params: List<String>,
     val sectionTitle: AdocSectionTitle?,
-    val content: AdocNode?
+    val content: AdocNode?,
+    val params: AdocParams
 ) : AdocNode
 
 data class AdocHeader(
