@@ -45,6 +45,7 @@ class AdocParamsParser(context: ParamsContext) {
                 val (nextPos, valueText) = takeUntil(pos, M_PARAM_COMMA, ",")
                 addPositionalParam(valueText)
                 pos = nextPos + 1
+                continue
             } else if (token.symbol.type == M_PARAM_WS || token.symbol.type == M_PARAM_COMMA) {
                 // ignore
             } else {

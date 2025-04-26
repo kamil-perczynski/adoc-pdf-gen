@@ -140,7 +140,7 @@ class TableParserTest {
 
                 2.3+>| Monaco | 36371 | 1.98
                 3+m| Gibraltar | 29431 | 6.8
-                | Poland | 38454 | 845.8
+                4.2+>.^d| Poland | 38454 | 845.8
                 |===
 
             """.trimIndent()
@@ -162,27 +162,34 @@ class TableParserTest {
         assertThat(table.colWidths).isNull()
         assertThat(table.colsCount).isEqualTo(3)
         assertThat(table.cols).containsExactly(
-            AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
+            /* ...values = */ AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "Population"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "Size"))),
             AdocTableCol(
                 chunks = listOf(AdocChunk(TEXT, "Monaco")),
-                colspan = "2.3+",
-                alignment = ">"
+                colspan = "2",
+                rowspan = "3",
+                horizontalAlignment = ">"
             ),
             AdocTableCol(listOf(AdocChunk(TEXT, "36371"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "1.98"))),
 
             AdocTableCol(
                 chunks = listOf(AdocChunk(TEXT, "Gibraltar")),
-                colspan = "3+",
-                alignment = "<",
+                colspan = "3",
                 cellFormat = "m"
             ),
             AdocTableCol(listOf(AdocChunk(TEXT, "29431"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "6.8"))),
 
-            AdocTableCol(listOf(AdocChunk(TEXT, "Poland"))),
+            AdocTableCol(
+                chunks = listOf(AdocChunk(TEXT, "Poland")),
+                colspan = "4",
+                rowspan = "2",
+                horizontalAlignment = ">",
+                verticalAlignment = "^",
+                cellFormat = "d"
+            ),
             AdocTableCol(listOf(AdocChunk(TEXT, "38454"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "845.8")))
         )

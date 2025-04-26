@@ -1,0 +1,142 @@
+= Invoice INV-2025-0426
+== Acme Corp / INV-2025-0426 / 2025-04-26
+:invoice-number: INV-2025-0426
+:date: 2025-04-26
+:customer: Jane Doe
+:email: jane.doe@example.com
+
+== Customer Information
+
+[cols="1,2"]
+|===
+|Invoice Number | {invoice-number}
+|Date           | {date}
+|Billed To      | {customer}
+|Email          | {email}
+|===
+
+== Items
+
+[cols="2,1,1,1",options="header",grid=all,frame=all]
+|===
+|Description |Qty |Unit Price |Total
+
+| Widget A    |2   | $50.00     | $100.00
+| Widget B    |1   | $75.00     | $75.00
+| Widget C    |5   | $20.00     | $100.00
+|===
+
+== Summary
+
+[cols="1,1,1",options="header",frame=ends]
+|===
+|Subtotal |Tax (10%) |Total
+
+| $275.00 | $27.50 | $302.50
+|===
+
+== Shipping Details
+
+[cols="1,2",frame=topbot,grid=cols]
+|===
+|Carrier |FedEx
+|Tracking Number |1234567890
+|Expected Delivery |2025-05-01
+|Shipping Method |Express Overnight
+|Shipping Address |
+123 Main Street
+Suite 456
+Metropolis, NY 10001
+|===
+
+== Contact Persons
+
+[cols="1,1,2",options="header",grid=all,frame=ends]
+|===
+|Role |Name |Contact Info
+
+|Sales Rep | *John Smith* | jsmith@acme.com
+Phone: +1-555-123-4567
+
+|Support Lead | _Anna Lee_ | alee@acme.com
+Phone: +1-555-765-4321
+|===
+
+== Tax Breakdown
+
+[cols="1,^1,^1",options="header",frame=none,grid=rows]
+|===
+|Type |Rate |Amount
+
+|State Tax |5% | $13.75
+|Federal Tax |5% | $13.75
+|Total Tax | *10%* | *$27.50*
+|===
+
+== Itemized With Nested Detail
+
+[cols="3,1,2,2,2",options="header",frame=all,grid=all]
+|===
+|Item |Qty |Total 2+|Detail
+
+1.4+|Super Gadget 1.4+|1 1.4+| $199.99
+
+| Cable Type | Length
+| USB-C | 1m
+| USB-A | 2m
+| HDMI  | 1.5m
+
+
+| Cable Pack | 3 | $45.00 2+| -
+
+|===
+
+== Rowspan & Colspan Example
+
+[cols="3,3,3",options="header",grid=all,frame=all]
+|===
+| Region | Salesperson | Amount
+
+| North America | Alice | $1200
+1.2+| Europe | Bob | $800
+|Charlie | $950
+3+^|Total: $2950
+|===
+
+== Payment Info
+
+[cols="1a",grid=rows]
+|===
+| Bank Transfer
+Account Name: Acme Corp
+Bank: Global Bank
+IBAN: GB00ACME1234567890
+SWIFT: GBLBGB22
+|===
+
+== Notes
+
+Please make the payment within 15 days.
+Thank you for your business!
+
+== Legal Notices
+
+**Terms and Conditions**
+
+Payment is due within 15 days from the invoice date.
+Late payments may incur a fee of 1.5% per month.
+
+Ownership of goods remains with Acme Corp until full payment is received.
+
+By making payment, the customer agrees to the terms set forth in this invoice.
+
+**Liability Disclaimer**
+
+Acme Corp shall not be held liable for any indirect, incidental, or consequential damages arising from the use of the products delivered under this invoice.
+
+Product specifications and availability are subject to change without notice.
+
+**Privacy Notice**
+
+Customer data is handled in accordance with our privacy policy.
+We do not sell or share personal information with third parties except as required by law or to fulfill services.

@@ -1,0 +1,80 @@
+$schema: "./adoc-stylesheet-schema.yaml"
+font:
+  catalog:
+    JetbrainsMono:
+      normal: static/JetBrainsMono-Regular.ttf
+      bold: static/JetBrainsMono-Bold.ttf
+      italic: static/JetBrainsMono-Italic.ttf
+      boldItalic: static/JetBrainsMono-BoldItalic.ttf
+    Inter:
+      normal: static/Inter_24pt-Regular.ttf
+      bold: static/Inter_24pt-Bold.ttf
+      italic: static/Inter_24pt-Italic.ttf
+      boldItalic: static/Inter_24pt-BoldItalic.ttf
+base:
+  fontSize: 10
+  fontFamily: JetbrainsMono
+paragraph:
+  lineHeight: 1.25rem
+  spacingBefore: .625rem
+  spacingAfter: .625rem
+  textAlign: left
+heading:
+  defaults:
+    font:
+      fontStyle: bold
+      textDecoration: none
+    lineHeight: 1.5rem
+    spacingBefore: 1rem
+    spacingAfter: 1rem
+    textAlign: left
+  h1:
+    font:
+      fontSize: 2rem
+  h2:
+    font:
+      fontSize: 1.25rem
+      fontStyle: bold
+  h3:
+    font:
+      fontSize: 1.25rem
+admonition:
+  heading:
+    textAlign: center
+sectionTitle:
+  font:
+    fontStyle: boldItalic
+  spacingBefore: 1rem
+  spacingAfter: .25rem
+  textAlign: left
+listItem:
+  spacingAfter: .5rem
+  spacingBefore: 0
+list:
+  paragraph:
+    spacingBefore: .75rem
+    spacingAfter: .75rem
+  defaults:
+    symbolIndent: 1rem
+    indentationLeft: .5rem
+    paragraph:
+      spacingBefore: .25rem
+      spacingAfter: .25rem
+  level1:
+    listSymbol: "•   "
+  level2:
+    listSymbol: "◦   "
+    numbered: false
+    lettered: true
+    lowercased: true
+    autoIndented: true
+  level3:
+    listSymbol: "▪   "
+    numbered: false
+    lettered: false
+    autoIndented: true
+table:
+  spacingAfter: .67rem
+  spacingBefore: .67rem
+  widthPercentage: 100
+  widths: [1]

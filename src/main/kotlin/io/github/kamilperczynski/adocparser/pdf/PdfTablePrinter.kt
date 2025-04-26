@@ -29,20 +29,33 @@ class PdfTablePrinter(
             pdfPCell.setPadding(stylesheet.baseFont.size * .75f)
             pdfPCell.paddingTop = 0f
 
+            if (col.colspan != null) {
+                pdfPCell.colspan = col.colspan.toInt()
+            }
+            if (col.rowspan != null) {
+                pdfPCell.rowspan = col.rowspan.toInt()
+            }
+
             if (idx < node.colsCount) {
                 pdfPCell.backgroundColor = Color(0xF0, 0xF0, 0xF0)
             }
 
-            when (col.alignment) {
+            when (col.horizontalAlignment) {
                 "<" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_LEFT
                 "^" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_CENTER
                 ">" -> pdfPCell.horizontalAlignment = PdfPCell.ALIGN_RIGHT
             }
 
+            when (col.verticalAlignment) {
+                "<" -> pdfPCell.verticalAlignment = PdfPCell.ALIGN_TOP
+                "^" -> pdfPCell.verticalAlignment = PdfPCell.ALIGN_MIDDLE
+                ">" -> pdfPCell.verticalAlignment = PdfPCell.ALIGN_BOTTOM
+            }
+
             for (chunk in col.chunks) {
                 val paragraph = Paragraph()
 
-                when (col.alignment) {
+                when (col.horizontalAlignment) {
                     "<" -> paragraph.alignment = PdfPCell.ALIGN_LEFT
                     "^" -> paragraph.alignment = PdfPCell.ALIGN_CENTER
                     ">" -> paragraph.alignment = PdfPCell.ALIGN_RIGHT
