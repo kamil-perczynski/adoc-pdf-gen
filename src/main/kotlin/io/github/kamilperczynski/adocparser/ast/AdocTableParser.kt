@@ -5,6 +5,8 @@ import org.antlr.v4.runtime.tree.TerminalNode
 
 private val COLS_ATTRIBUTE_REGEX = "\\d+".toRegex()
 
+private val TABLE_CELL_REGEX = Regex("^([0-9])?(\\.?[0-9]+\\+)?([>^<])?\\.?([>^<])?([adehlms])?\\|$")
+
 class AdocTableParser(private val ast: AdocAST, private val currentSection: AdocSection) {
 
     private var inferredColsCount: Int = 0
@@ -45,37 +47,49 @@ class AdocTableParser(private val ast: AdocAST, private val currentSection: Adoc
         )
     }
 
+    // TODO: Rewrite this method so it doesn't use regexes
     private fun parseColumn(col: Table_cellContext, cols: MutableList<AdocTableCol>) {
-        var pos = 0
-        val firstChild = col.children[pos]
+        val celltoken = col.TABLE_CELL_START().text
 
-        var colspan: String? = null
-        var alignment = "<"
-        var cellFormat = "d"
+        val match = TABLE_CELL_REGEX.find(celltoken)
 
-        if (firstChild is TerminalNode && firstChild.symbol.type == T_COLSPAN) {
-            pos++
-            colspan = firstChild.text
+        if (match == null) {
+            throw IllegalArgumentException("Invalid table cell token: $celltoken")
         }
 
-        val secondChild = col.children[pos]
-        if (secondChild is TerminalNode && secondChild.symbol.type == T_ALIGNMENT) {
-            pos++
-            alignment = secondChild.text
-        }
+        val span1 = match.groupValues[1]
+            .ifEmpty { null }
+            ?.let { COLS_ATTRIBUTE_REGEX.find(it)?.value }
 
-        val thirdChild = col.children[pos]
-        if (thirdChild is TerminalNode && thirdChild.symbol.type == T_FORMAT_MODE) {
-            pos++
-            cellFormat = thirdChild.text
-        }
+        val span2 = match.groupValues[2]
+            .ifEmpty { null }
+            ?.let { COLS_ATTRIBUTE_REGEX.find(it)?.value }
 
-        // TODO: Parse recursively with paragraph rule?
+        val colspan = span1 ?: span2
+        val rowspan = if (span1 != null) span2 else span1
+
+
+        val horizontalAlignment = match.groupValues[3].ifEmpty { null }
+        val verticalAlignment = match.groupValues[4].ifEmpty { null }
+        val mod = match.groupValues[5].ifEmpty { null }
+
         val chunk = AdocChunk(
-            ChunkType.TEXT,
-            col.children.drop(pos + 1).joinToString(separator = "") { it.text }.trim()
+            type = ChunkType.TEXT,
+            text = col.children
+                .drop(1)
+                .joinToString("") { it.text }
+                .trim(),
         )
 
-        cols.add(AdocTableCol(listOf(chunk), colspan, alignment, cellFormat))
+        cols.add(
+            AdocTableCol(
+                chunks = listOf(chunk),
+                rowspan = rowspan,
+                colspan = colspan,
+                horizontalAlignment = horizontalAlignment,
+                verticalAlignment = verticalAlignment,
+                cellFormat = mod
+            )
+        )
     }
 }

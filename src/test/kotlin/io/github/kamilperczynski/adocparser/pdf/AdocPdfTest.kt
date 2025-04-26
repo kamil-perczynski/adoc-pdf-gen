@@ -44,7 +44,11 @@ class AdocPdfTests {
                 yamlStylesheet.base?.fontFamily = "times"
 
                 val stylesheet: AdocStylesheet =
-                    YamlAdocStylesheet(Paths.get("./fonts").toAbsolutePath(), yamlStylesheet, HashmapFontsCache())
+                    YamlAdocStylesheet(
+                        Paths.get("./fonts").toAbsolutePath(),
+                        yamlStylesheet,
+                        HashmapFontsCache()
+                    )
 
                 return stylesheet
             }
@@ -55,6 +59,80 @@ class AdocPdfTests {
             assertThat(printingTimes.p50).isLessThanOrEqualTo(50)
 
             assertThat(totalTimes.p90).isLessThanOrEqualTo(85)
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class DocumentationChroniclesTest : AdocPdfTest() {
+
+        override val sourceAdocContent: String
+            get() = AdocPdfTest::class.java.classLoader
+                .getResourceAsStream("./doc3.adoc")?.let { String(it.readAllBytes()) }
+                ?: throw IllegalStateException("Cannot read file")
+
+        override val targetPdfFile: Path
+            get() = Paths.get("./AdocPdf-Test-Documentation-Chronicles.pdf")
+
+        override val stylesheet: AdocStylesheet
+            get() {
+                val yamlStylesheet =
+                    parseYamlStylesheet(this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!)
+
+                yamlStylesheet.base?.fontFamily = "times"
+
+                val stylesheet: AdocStylesheet =
+                    YamlAdocStylesheet(
+                        Paths.get("./fonts").toAbsolutePath(),
+                        yamlStylesheet,
+                        HashmapFontsCache()
+                    )
+
+                return stylesheet
+            }
+
+        override fun assertStats() {
+            assertThat(totalTimes.p50).isLessThanOrEqualTo(80)
+            assertThat(parsingTimes.p50).isLessThanOrEqualTo(30)
+            assertThat(printingTimes.p50).isLessThanOrEqualTo(50)
+
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(150)
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class InvoiceTest : AdocPdfTest() {
+
+        override val sourceAdocContent: String
+            get() = AdocPdfTest::class.java.classLoader
+                .getResourceAsStream("./doc4.adoc")?.let { String(it.readAllBytes()) }
+                ?: throw IllegalStateException("Cannot read file")
+
+        override val targetPdfFile: Path
+            get() = Paths.get("./AdocPdf-Test-Invoice.pdf")
+
+        override val stylesheet: AdocStylesheet
+            get() {
+                val yamlStylesheet =
+                    parseYamlStylesheet(this.javaClass.classLoader.getResourceAsStream("./invoice-stylesheet.yaml")!!)
+
+                val stylesheet: AdocStylesheet =
+                    YamlAdocStylesheet(
+                        Paths.get("./fonts").toAbsolutePath(),
+                        yamlStylesheet,
+                        HashmapFontsCache()
+                    )
+
+                return stylesheet
+            }
+
+        override fun assertStats() {
+            assertThat(totalTimes.p50).isLessThanOrEqualTo(30)
+            assertThat(parsingTimes.p50).isLessThanOrEqualTo(7)
+            assertThat(printingTimes.p50).isLessThanOrEqualTo(23)
+
+            assertThat(totalTimes.p90).isLessThanOrEqualTo(50)
         }
     }
 
@@ -76,7 +154,11 @@ class AdocPdfTests {
                     parseYamlStylesheet(this.javaClass.classLoader.getResourceAsStream("./stylesheet.yaml")!!)
 
                 val stylesheet: AdocStylesheet =
-                    YamlAdocStylesheet(Paths.get("./fonts").toAbsolutePath(), yamlStylesheet, HashmapFontsCache())
+                    YamlAdocStylesheet(
+                        Paths.get("./fonts").toAbsolutePath(),
+                        yamlStylesheet,
+                        HashmapFontsCache()
+                    )
 
                 return stylesheet
             }

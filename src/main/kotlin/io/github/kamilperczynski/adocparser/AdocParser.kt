@@ -87,7 +87,7 @@ private fun toAdocSection(child: AsciidocParser.SectionContext): AdocSection {
         ?.let { parseAdocParams(it.params()) }
         ?: EMPTY_ADOC_PARAMS
 
-    val id = child.id()?.firstOrNull()?.WORD()?.text
+    val id = child.id()?.firstOrNull()?.WORD()?.joinToString("") { it.text }
     val sectionTitle = toSectionTitle(child)
 
     return AdocSection(id, sectionTitle, null, params)

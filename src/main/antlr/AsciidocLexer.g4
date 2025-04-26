@@ -52,16 +52,12 @@ M_PARAM_VALUE : ~[\r\n ,"'\][=]+;
 PARAM_END: ']' -> popMode;
 
 mode M_TABLE;
-T_FORMAT_MODE: [adehlms];
-T_ALIGNMENT : [^><];
-T_COLSPAN : [0-9]* '.'? [0-9]+ '+';
-TABLE_CELL_START: '|';
-
+TABLE_CELL_START: ([0-9]* '.'? [0-9]+ '+')? [^><]? '.'? [^><]? [adehlms]? '|';
 
 T_WS : [ \t]+;
 T_EOL : '\r'? '\n';
 TABLE_END : '|===' '\r'? '\n' -> popMode;
-T_INTER: ~[\p{L}\p{N} \r\n^><|]+;
+T_INTER: ~[\p{L}\p{N} \r\n]+;
 T_WORD : [\p{L}\p{N}]+;
 
 mode M_BLOCK;

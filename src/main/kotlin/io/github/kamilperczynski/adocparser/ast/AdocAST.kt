@@ -78,8 +78,10 @@ class AdocPageBreak : AdocNode {
 data class AdocTableCol(
     val chunks: List<AdocChunk>,
     val colspan: String? = null,
-    val alignment: String? = "<",
-    val cellFormat: String = "d"
+    val rowspan: String? = null,
+    val horizontalAlignment: String? = null,
+    val verticalAlignment: String? = null,
+    val cellFormat: String? = null
 ) : AdocNode
 
 enum class ChunkType {
