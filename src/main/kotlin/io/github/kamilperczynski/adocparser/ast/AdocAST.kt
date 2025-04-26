@@ -42,7 +42,13 @@ data class AdocListItem(
 data class AdocParagraph(val chunks: List<AdocChunk>) : AdocNode
 data class AdocBlock(val lines: List<AdocChunk>) : AdocNode
 
-data class AdocChunk(val type: ChunkType, val text: String, val emphasis: EmphasisType = EmphasisType.NONE)
+data class AdocChunk(
+    val type: ChunkType,
+    val text: String,
+    val emphasis: EmphasisType = EmphasisType.NONE,
+    val params: AdocParams? = null
+)
+
 data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 
 data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode

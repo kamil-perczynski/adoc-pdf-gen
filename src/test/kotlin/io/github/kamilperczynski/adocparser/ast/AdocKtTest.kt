@@ -58,7 +58,11 @@ class AdocKtTest {
             AdocParagraph(
                 listOf(
                     AdocChunk(TEXT, "Is that a link? "),
-                    AdocChunk(LINK, "http://example.com?param1=value1&param2=value2"),
+                    AdocChunk(
+                        type = LINK,
+                        text = "http://example.com?param1=value1&param2=value2",
+                        params = EMPTY_ADOC_PARAMS
+                    ),
                     AdocChunk(TEXT, " ")
                 )
             ),

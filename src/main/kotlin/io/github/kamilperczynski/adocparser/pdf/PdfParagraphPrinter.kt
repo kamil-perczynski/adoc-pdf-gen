@@ -61,7 +61,8 @@ class PdfParagraphPrinter(
                         color = Color.BLUE
                     }
 
-                    val anchor = Anchor(chunk.text, linkFont).apply {
+                    val linkText = chunk.params?.positionalParams[0] ?: chunk.text
+                    val anchor = Anchor(linkText, linkFont).apply {
                         reference = chunk.text
                     }
                     paragraph.add(anchor)

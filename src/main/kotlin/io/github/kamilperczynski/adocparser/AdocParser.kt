@@ -86,7 +86,7 @@ class AdocParser(adoc: String) {
 
 private fun toAdocSection(child: AsciidocParser.SectionContext): AdocSection {
     val params = child.param_line().lastOrNull()
-        ?.let { AdocParamsParser(it).parse() }
+        ?.let { parseAdocParams(it.params()) }
         ?: EMPTY_ADOC_PARAMS
 
     val id = child.id_line()?.id()?.WORD()?.text

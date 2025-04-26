@@ -16,16 +16,14 @@ class AdocTextChunker {
     internal val chunks = mutableListOf<AdocChunk>()
 
     fun parseLine(fn: Supplier<List<ParseTree>>): AdocTextChunker {
-        for ((pos, child) in fn.get().withIndex()) {
+        for (child in fn.get()) {
             when (child) {
                 is MacroContext -> {
                     currentChunk.str.append(child.text)
-                    // println("..MACRO..: ${child.text}")
                 }
 
                 is ParamsContext -> {
                     finishChunk()
-                    // println("..PARAMS..: ${child.text}")
                 }
 
                 is LinkContext -> {
@@ -34,7 +32,7 @@ class AdocTextChunker {
                 }
 
                 is TerminalNode -> {
-                    appendToken(pos, child)
+                    appendToken(child)
                 }
             }
         }
@@ -57,13 +55,14 @@ class AdocTextChunker {
         }
 
         if (isValidUrl(str.toString())) {
-            chunks.add(AdocChunk(ChunkType.LINK, str.toString()))
+            val params = parseAdocParams(link.params())
+            chunks.add(AdocChunk(type = ChunkType.LINK, text = str.toString(), params = params))
         } else {
             chunks.add(AdocChunk(ChunkType.TEXT, str.toString()))
         }
     }
 
-    private fun appendToken(pos: Int, child: TerminalNode) {
+    private fun appendToken(child: TerminalNode) {
         when (child.symbol.type) {
             EOL -> {
                 currentChunk.str.append(' ')
@@ -155,9 +154,9 @@ fun isValidUrl(url: String): Boolean {
     try {
         URI.create(url)
         return true
-    } catch (e: MalformedURLException) {
+    } catch (_: MalformedURLException) {
         return false
-    } catch (e: URISyntaxException) {
+    } catch (_: URISyntaxException) {
         return false
     }
 }

@@ -3,11 +3,19 @@ package io.github.kamilperczynski.adocparser.ast
 import io.github.kamilperczynski.adocparser.AsciidocParser.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class AdocParamsParser(ctx: Param_lineContext?) {
+fun parseAdocParams(context: ParamsContext?): AdocParams {
+    if (context == null) {
+        return EMPTY_ADOC_PARAMS
+    }
+
+    return AdocParamsParser(context).parse()
+}
+
+class AdocParamsParser(context: ParamsContext) {
 
     private var pos = 0
 
-    private val tokens = ctx!!.params()!!.children.subList(1, ctx.params()!!.children.size - 1)
+    private val tokens = context.children.subList(1, context.children.size - 1)
 
     private val positionalParams: MutableMap<Int, String> = mutableMapOf()
     private val namedParams: MutableMap<String, String> = mutableMapOf()
