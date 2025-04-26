@@ -14,8 +14,8 @@ block: ADMONITION_LINE? section_title? BLOCK_START BLOCK_CONTENT+ BLOCK_END;
 comment: DOUBLE_SLASH ~EOL* EOL;
 header : HEADER_START (id | ~EOL)+ EOL;
 
-section:
- (param_line+ | comment+ | section_title+ | ADMONITION_LINE+ | EOL+)*  (page_break | list_item+ | id_line | attribute+ | header | block | paragraph_line+ | table | admonition)
+section: comment+
+ | ((param_line+ | section_title+ | id | ADMONITION_LINE+ | EOL+)*  (page_break | list_item+ | attribute+ | header | block | paragraph_line+ | table | admonition))
 ;
 
 page_break: PAGE_BREAK WS* EOL;

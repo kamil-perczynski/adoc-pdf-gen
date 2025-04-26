@@ -29,12 +29,10 @@ class AdocParser(adoc: String) {
                 val paragraph = toAdocParagraph(child.paragraph_line())
 
                 if (admonitionSectionType != null) {
-                    ast.push(
-                        currentSection.copy(content = AdocAdmonition(admonitionSectionType, paragraph))
-                    )
+                    val adocAdmonition = AdocAdmonition(admonitionSectionType, paragraph)
+                    ast.push(currentSection.copy(content = adocAdmonition))
                 } else {
-                    currentSection.sectionTitle?.let { ast.push(it) }
-                    ast.push(paragraph)
+                    ast.push(currentSection.copy(content = paragraph))
                 }
             } else if (child.header() != null) {
                 AdocHeaderParser(ast, currentSection).parse(child.header())
@@ -89,7 +87,7 @@ private fun toAdocSection(child: AsciidocParser.SectionContext): AdocSection {
         ?.let { parseAdocParams(it.params()) }
         ?: EMPTY_ADOC_PARAMS
 
-    val id = child.id_line()?.id()?.WORD()?.text
+    val id = child.id()?.firstOrNull()?.WORD()?.text
     val sectionTitle = toSectionTitle(child)
 
     return AdocSection(id, sectionTitle, null, params)

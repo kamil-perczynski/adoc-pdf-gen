@@ -96,7 +96,6 @@ class AdocPdfTests {
 
 }
 
-
 abstract class AdocPdfTest {
 
     internal val totalTimes = Stat()

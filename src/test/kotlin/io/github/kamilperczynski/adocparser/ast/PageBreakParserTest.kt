@@ -14,12 +14,12 @@ class PageBreakParserTest {
             """
                 .List <<< of items
                 Paragraph before page break <<<
-                
+
                 [%force]
                 <<<
-                
+
                 <<< Paragraph after page break
-                
+
             """.trimIndent()
         )
 
@@ -28,10 +28,14 @@ class PageBreakParserTest {
 
         // then
         assertThat(ast.nodes).containsExactly(
-            AdocSectionTitle(listOf(AdocChunk(TEXT, "List <<< of items "))),
-            AdocParagraph(listOf(AdocChunk(TEXT, "Paragraph before page break <<< "))),
+            AdocSection(
+                sectionTitle = AdocSectionTitle(listOf(AdocChunk(TEXT, "List <<< of items "))),
+                content = AdocParagraph(listOf(AdocChunk(TEXT, "Paragraph before page break <<< ")))
+            ),
             AdocPageBreak(),
-            AdocParagraph(listOf(AdocChunk(TEXT, "<<< Paragraph after page break "))),
+            AdocSection(
+                content = AdocParagraph(listOf(AdocChunk(TEXT, "<<< Paragraph after page break ")))
+            ),
         )
     }
 
@@ -42,12 +46,12 @@ class PageBreakParserTest {
             """
                 * <<< Item 1
                 * <<< Item 2
-                
+
                 [%force]
                 <<<
-                
+
                 . List <<< of items
-                
+
             """.trimIndent()
         )
 

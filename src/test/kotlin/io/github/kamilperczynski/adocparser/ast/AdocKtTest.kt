@@ -15,7 +15,7 @@ class AdocKtTest {
         val parser = AdocParser(
             """
                 This is a *bold* statement, and this is _italicized_.
-                
+
             """.trimIndent()
         )
 
@@ -24,15 +24,18 @@ class AdocKtTest {
 
         // then
         assertThat(ast.nodes).containsExactly(
-            AdocParagraph(
-                listOf(
-                    AdocChunk(TEXT, "This is a "),
-                    AdocChunk(EMPHASIS, "bold", BOLD),
-                    AdocChunk(TEXT, " statement, and this is "),
-                    AdocChunk(EMPHASIS, "italicized", ITALIC),
-                    AdocChunk(TEXT, ". ")
+            AdocSection(
+                content = AdocParagraph(
+                    listOf(
+                        AdocChunk(TEXT, "This is a "),
+                        AdocChunk(EMPHASIS, "bold", BOLD),
+                        AdocChunk(TEXT, " statement, and this is "),
+                        AdocChunk(EMPHASIS, "italicized", ITALIC),
+                        AdocChunk(TEXT, ". ")
+                    )
                 )
             )
+
         )
     }
 
@@ -41,12 +44,15 @@ class AdocKtTest {
         // given
         val parser = AdocParser(
             """
+                [[SectionRefId]]
                 Is that a link? http://example.com?param1=value1&param2=value2
-                
+
                 // FooBar
-                
+
+                .BooFoo
+                [[FooBar]]
                 Yes it is
-                
+
             """.trimIndent()
         )
 
@@ -55,18 +61,25 @@ class AdocKtTest {
 
         // then
         assertThat(ast.nodes).containsExactly(
-            AdocParagraph(
-                listOf(
-                    AdocChunk(TEXT, "Is that a link? "),
-                    AdocChunk(
-                        type = LINK,
-                        text = "http://example.com?param1=value1&param2=value2",
-                        params = EMPTY_ADOC_PARAMS
-                    ),
-                    AdocChunk(TEXT, " ")
+            AdocSection(
+                id = "SectionRefId",
+                content = AdocParagraph(
+                    listOf(
+                        AdocChunk(TEXT, "Is that a link? "),
+                        AdocChunk(
+                            type = LINK,
+                            text = "http://example.com?param1=value1&param2=value2",
+                            params = EMPTY_ADOC_PARAMS
+                        ),
+                        AdocChunk(TEXT, " ")
+                    )
                 )
             ),
-            AdocParagraph(listOf(AdocChunk(TEXT, "Yes it is ")))
+            AdocSection(
+                id = "FooBar",
+                sectionTitle = AdocSectionTitle(listOf(AdocChunk(TEXT, "BooFoo "))),
+                content = AdocParagraph(listOf(AdocChunk(TEXT, "Yes it is ")))
+            )
         )
     }
 }
