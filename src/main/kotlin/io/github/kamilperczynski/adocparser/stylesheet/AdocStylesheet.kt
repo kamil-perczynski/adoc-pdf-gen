@@ -3,6 +3,7 @@ package io.github.kamilperczynski.adocparser.stylesheet
 import com.lowagie.text.Font
 import com.lowagie.text.ListItem
 import com.lowagie.text.Paragraph
+import com.lowagie.text.pdf.PdfPTable
 import io.github.kamilperczynski.adocparser.ast.*
 
 interface AdocStylesheet {
@@ -24,6 +25,8 @@ interface AdocStylesheet {
     fun styleList(pdfList: PdfList, adocList: AdocList, nestingLevel: Int)
 
     fun styleListWrapper(pdfParagraph: Paragraph, adocList: AdocList)
+
+    fun styleTable(table: PdfPTable, section: AdocTable, section1: AdocSection)
 
 }
 

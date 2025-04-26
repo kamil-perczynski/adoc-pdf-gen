@@ -1,8 +1,10 @@
 package io.github.kamilperczynski.adocparser.stylesheet.yaml
 
 import com.lowagie.text.Chunk
+import com.lowagie.text.Element.*
 import com.lowagie.text.ListItem
 import com.lowagie.text.Paragraph
+import com.lowagie.text.pdf.PdfPTable
 import io.github.kamilperczynski.adocparser.ast.*
 import io.github.kamilperczynski.adocparser.stylesheet.AdocStylesheet
 import io.github.kamilperczynski.adocparser.stylesheet.FontsCache
@@ -20,6 +22,29 @@ class YamlAdocStylesheet(
 ) : AdocStylesheet {
 
     private val baseFontProps = FONT_FALLBACK.merge(yamlStylesheet.base)
+
+    override fun styleTable(table: PdfPTable, adocTable: AdocTable, section: AdocSection) {
+        val tableProps = TABLE_PROPS_FALLBACK
+            .merge(yamlStylesheet.table)
+
+        table.horizontalAlignment = toTableHorizontalAlignment(tableProps)
+        table.widthPercentage = tableProps.widthPercentage!!
+
+        tableProps.spacingBefore
+            ?.let { parseUnit(it, baseFont.size) }
+            ?.let { table.setSpacingBefore(it) }
+
+        tableProps.spacingAfter
+            ?.let { parseUnit(it, baseFont.size) }
+            ?.let { table.setSpacingAfter(it) }
+
+        val colWidthsProps = adocTable.colWidths ?: tableProps.widths ?: listOf(1)
+
+        val colWidths = IntArray(adocTable.colsCount) { 1 }
+            .mapIndexed { idx, _ -> colWidthsProps[idx % colWidthsProps.size] }
+            .toIntArray()
+        table.setWidths(colWidths)
+    }
 
     override fun registerFonts() {
         for (entry in yamlStylesheet.font.catalog) {
@@ -187,6 +212,16 @@ class YamlAdocStylesheet(
     }
 }
 
+private fun toTableHorizontalAlignment(tableProps: YamlTableProps): Int {
+    return when (tableProps.horizontalAlignment) {
+        left -> ALIGN_LEFT
+        center -> ALIGN_CENTER
+        right -> ALIGN_RIGHT
+        justify -> ALIGN_JUSTIFIED
+        else -> ALIGN_LEFT
+    }
+}
+
 private fun toHeaderProps(headerLevel: Int, headingProps: YamlHeadingProperties): YamlParagraphProps? {
     return when (headerLevel) {
         1 -> headingProps.h1
@@ -201,10 +236,10 @@ private fun toHeaderProps(headerLevel: Int, headingProps: YamlHeadingProperties)
 
 private fun toTextAlign(textAlign: YamlTextAlign?): Int {
     return when (textAlign) {
-        left -> Paragraph.ALIGN_LEFT
-        center -> Paragraph.ALIGN_CENTER
-        right -> Paragraph.ALIGN_RIGHT
-        justify -> Paragraph.ALIGN_JUSTIFIED
-        else -> Paragraph.ALIGN_LEFT
+        left -> ALIGN_LEFT
+        center -> ALIGN_CENTER
+        right -> ALIGN_RIGHT
+        justify -> ALIGN_JUSTIFIED
+        else -> ALIGN_LEFT
     }
 }

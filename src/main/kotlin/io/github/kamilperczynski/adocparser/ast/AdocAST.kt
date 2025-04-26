@@ -51,7 +51,12 @@ data class AdocChunk(
 
 data class AdocSectionTitle(val chunks: List<AdocChunk>) : AdocNode
 
-data class AdocTable(val colsCount: Int, val cols: List<AdocTableCol>) : AdocNode
+data class AdocTable(
+    val colWidths: List<Int>? = null,
+    val colsCount: Int,
+    val cols: List<AdocTableCol>
+) : AdocNode
+
 data class AdocAdmonition(val admonitionType: AdmonitionType, val paragraph: AdocParagraph) : AdocNode
 
 class AdocPageBreak : AdocNode {

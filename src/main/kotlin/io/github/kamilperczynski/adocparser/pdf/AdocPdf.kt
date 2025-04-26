@@ -22,7 +22,7 @@ class AdocPdf(stylesheet: AdocStylesheet) {
         PdfHeaderPrinter(document, stylesheet, chapterCounter, pdfParagraphPrinter)
 
     private val tablePrinter =
-        PdfTablePrinter(document, stylesheet.baseFont, pdfParagraphPrinter)
+        PdfTablePrinter(document, stylesheet, pdfParagraphPrinter)
 
     private val blockPrinter = PdfBlockPrinter(document, monospaceFont)
     private val listPrinter = PdfListPrinter(document, stylesheet, pdfParagraphPrinter)
@@ -42,14 +42,14 @@ class AdocPdf(stylesheet: AdocStylesheet) {
         document.close()
     }
 
-    private fun printNode(node: AdocNode, writer: PdfWriter) {
+    private fun printNode(node: AdocNode, writer: PdfWriter, section: AdocSection? = null) {
         when (node) {
             is AdocParagraph -> pdfParagraphPrinter.printParagraph(node)
             is AdocSectionTitle -> pdfParagraphPrinter.printSectionTitle(node)
             is AdocHeader -> headerPrinter.printHeader(node, writer)
             is AdocBlock -> blockPrinter.printBlock(node)
             is AdocList -> listPrinter.printList(node)
-            is AdocTable -> tablePrinter.printTable(node)
+            is AdocTable -> tablePrinter.printTable(node, section)
             is AdocAdmonition -> admonitionPrinter.printAdmonition(node)
             is AdocSection -> {
                 if (node.sectionTitle != null) {
@@ -57,7 +57,7 @@ class AdocPdf(stylesheet: AdocStylesheet) {
                 }
 
                 if (node.content != null) {
-                    printNode(node.content, writer)
+                    printNode(node.content, writer, node)
                 }
             }
 
