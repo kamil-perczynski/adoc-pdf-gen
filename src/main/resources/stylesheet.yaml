@@ -77,3 +77,8 @@ list:
     numbered: false
     lettered: false
     autoIndented: true
+table:
+  spacingAfter: .67rem
+  spacingBefore: .67rem
+  widthPercentage: 100
+  widths: [ 2, 1, 1, 1, 1, 1]

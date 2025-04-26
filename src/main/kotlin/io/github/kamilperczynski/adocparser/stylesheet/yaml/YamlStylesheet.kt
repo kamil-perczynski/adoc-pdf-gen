@@ -9,7 +9,33 @@ data class YamlStylesheet(
     var paragraph: YamlParagraphProps = YamlParagraphProps(),
     var admonition: YamlAdmonitionProperties = YamlAdmonitionProperties(),
     var list: YamlListsProps = YamlListsProps(),
+    var table: YamlTableProps = YamlTableProps(),
 )
+
+data class YamlTableProps(
+    var font: YamlFontProps? = YamlFontProps(),
+    var horizontalAlignment: YamlTextAlign? = null,
+    var widthPercentage: Float? = null,
+    var spacingBefore: String? = null,
+    var spacingAfter: String? = null,
+    var keepTogether: Boolean? = null,
+    var widths: List<Int>? = null
+) {
+    fun merge(other: YamlTableProps?): YamlTableProps {
+        if (other == null) {
+            return this
+        }
+
+        return YamlTableProps(
+            font = other.font ?: font,
+            widthPercentage = other.widthPercentage ?: widthPercentage,
+            spacingBefore = other.spacingBefore ?: spacingBefore,
+            spacingAfter = other.spacingAfter ?: spacingAfter,
+            keepTogether = other.keepTogether ?: keepTogether,
+            widths = other.widths ?: widths
+        )
+    }
+}
 
 data class YamlFontCatalog(
     /**
@@ -161,6 +187,9 @@ fun parseUnit(value: String?, baseFontSize: Float): Float? {
 
         return trimmed.toFloat()
     } catch (e: NumberFormatException) {
-        throw IllegalArgumentException("Invalid value for font size: $value. Only floats and rems are allowed", e)
+        throw IllegalArgumentException(
+            "Invalid value for font size: $value. Only floats and rems are allowed",
+            e
+        )
     }
 }

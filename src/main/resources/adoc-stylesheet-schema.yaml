@@ -3,6 +3,34 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 title: "AdocStylesheetSchema"
 type: "object"
 $defs:
+  TableProps:
+    type: object
+    properties:
+      font:
+        $ref: "#/$defs/FontProperties"
+      horizontalAlignment:
+        type: string
+        enum: [ "left", "center", "right" ]
+      widthPercentage:
+        type: number
+        description: width percentage that the table will occupy in the page
+        maximum: 100
+        minimum: 0
+      spacingBefore:
+        type: [ string, number ]
+      spacingAfter:
+        type: [ string, number ]
+      keepTogether:
+        type: boolean
+      widths:
+        type: array
+        items:
+          type: integer
+          description: >-
+            Width of the column as a fraction of the table width.
+            E.g. [2, 1, 1] means that the first column will be 2/4 of the table width.
+
+            The values are repeated if the number of columns is greater than the number of values.
   ListProps:
     type: object
     properties:
@@ -97,7 +125,7 @@ properties:
     $ref: "#/$defs/FontProperties"
   heading:
     description: >-
-      Font properties for headings. 
+      Font properties for headings.
       The properties defined here are the default values for all headings.
     type: object
     properties:
@@ -120,7 +148,7 @@ properties:
   admonition:
     type: object
     description: >-
-      Font properties for admonitions. 
+      Font properties for admonitions.
       The properties defined here are the default values for all admonitions.
     properties:
       heading:
@@ -142,3 +170,7 @@ properties:
         $ref: "#/$defs/ListProps"
       level4:
         $ref: "#/$defs/ListProps"
+  table:
+    type: object
+    allOf:
+      - $ref: "#/$defs/TableProps"

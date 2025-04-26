@@ -24,7 +24,7 @@ class TableParserTest {
                 | 29431
                 | 6.8
                 |===
-                
+
             """.trimIndent()
         )
 
@@ -52,6 +52,7 @@ class TableParserTest {
 
         assertThat(adocSection.content).isEqualTo(
             AdocTable(
+                colWidths = listOf(50, 25, 25),
                 colsCount = 3,
                 cols = listOf(
                     AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
@@ -78,12 +79,12 @@ class TableParserTest {
                 [cols="50e,^25m,>25s",width="75%",options="header",align="center"]
                 |===
                 | Country | Population | Size
-                
-                
+
+
                 | Monaco | 36371 | 1.98
                 | Gibraltar | 29431 | 6.8
                 |===
-                
+
             """.trimIndent()
         )
 
@@ -111,6 +112,7 @@ class TableParserTest {
             .isEqualTo(AdocSectionTitle(listOf(AdocChunk(TEXT, "Countries in Europe "))))
         assertThat(adocSection.content).isEqualTo(
             AdocTable(
+                colWidths = listOf(50, 25, 25),
                 colsCount = 3,
                 cols = listOf(
                     AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
@@ -134,13 +136,13 @@ class TableParserTest {
             """
                 |===
                 | Country | Population | Size
-                
-                
+
+
                 2.3+>| Monaco | 36371 | 1.98
                 3+m| Gibraltar | 29431 | 6.8
                 | Poland | 38454 | 845.8
                 |===
-                
+
             """.trimIndent()
         )
 
@@ -157,6 +159,8 @@ class TableParserTest {
         assertThat(adocSection.content).isInstanceOf(AdocTable::class.java)
 
         val table = adocSection.content as AdocTable
+        assertThat(table.colWidths).isNull()
+        assertThat(table.colsCount).isEqualTo(3)
         assertThat(table.cols).containsExactly(
             AdocTableCol(listOf(AdocChunk(TEXT, "Country"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "Population"))),
@@ -182,7 +186,5 @@ class TableParserTest {
             AdocTableCol(listOf(AdocChunk(TEXT, "38454"))),
             AdocTableCol(listOf(AdocChunk(TEXT, "845.8")))
         )
-
-        assertThat(table.colsCount).isEqualTo(3)
     }
 }

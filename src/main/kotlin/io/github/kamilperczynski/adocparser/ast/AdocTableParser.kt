@@ -3,6 +3,8 @@ package io.github.kamilperczynski.adocparser.ast
 import io.github.kamilperczynski.adocparser.AsciidocParser.*
 import org.antlr.v4.runtime.tree.TerminalNode
 
+private val COLS_ATTRIBUTE_REGEX = "\\d+".toRegex()
+
 class AdocTableParser(private val ast: AdocAST, private val currentSection: AdocSection) {
 
     private var inferredColsCount: Int = 0
@@ -25,8 +27,21 @@ class AdocTableParser(private val ast: AdocAST, private val currentSection: Adoc
 
         }
 
+        val colWidths = currentSection.params.namedParams["cols"]
+            ?.let { colsAttribute ->
+                colsAttribute
+                    .split(',')
+                    .mapNotNull { COLS_ATTRIBUTE_REGEX.find(it)?.value?.toInt() }
+            }
+
         ast.push(
-            currentSection.copy(content = AdocTable(inferredColsCount, cols))
+            currentSection.copy(
+                content = AdocTable(
+                    colWidths = colWidths,
+                    colsCount = colWidths?.size ?: inferredColsCount,
+                    cols = cols
+                )
+            )
         )
     }
 
