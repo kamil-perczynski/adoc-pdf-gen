@@ -15,10 +15,10 @@ class AdocAST {
 interface AdocNode
 
 data class AdocSection(
-    val id: String?,
-    val sectionTitle: AdocSectionTitle?,
-    val content: AdocNode?,
-    val params: AdocParams
+    val id: String? = null,
+    val sectionTitle: AdocSectionTitle? = null,
+    val content: AdocNode? = null,
+    val params: AdocParams = EMPTY_ADOC_PARAMS
 ) : AdocNode
 
 data class AdocHeader(
