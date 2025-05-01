@@ -36,7 +36,7 @@ class PdfTablePrinter(
                 pdfPCell.rowspan = col.rowspan.toInt()
             }
 
-            if (idx < node.colsCount) {
+            if (table.rows.isEmpty()) {
                 pdfPCell.backgroundColor = Color(0xF0, 0xF0, 0xF0)
             }
 
